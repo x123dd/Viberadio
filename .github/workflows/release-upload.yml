@@ -19,7 +19,7 @@ jobs:
 
       - name: Reassemble installer
         run: |
-          cat .release-chunks/exe.part* > XHeartMusic-1.1.1-Setup.exe
+          cat .release-chunks/exe.part* release-parts/exe.part* > XHeartMusic-1.1.1-Setup.exe
           cp dist/XHeartMusic-1.1.1-Setup.exe.blockmap .
           cp dist/XHeartMusic-1.1.1-SHA256SUMS.txt .
           sha256sum XHeartMusic-1.1.1-Setup.exe
