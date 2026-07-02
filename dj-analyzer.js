@@ -1,6 +1,13 @@
 const DEFAULT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 const FULL_STREAM_QUALITY_LIMIT_SEC = 7200;
 
+// 生产环境静音调试日志（由 desktop/main.js 设置 XHEARTMUSIC_SILENT_LOGS=1）
+if (process.env.XHEARTMUSIC_SILENT_LOGS === '1') {
+  console.log = () => {};
+  console.info = () => {};
+  console.debug = () => {};
+}
+
 function clamp01(v) {
   return Math.max(0, Math.min(1, Number(v) || 0));
 }

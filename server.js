@@ -49,10 +49,18 @@ const https = require('https');
 const fs   = require('fs');
 const path = require('path');
 const crypto = require('crypto');
+const os = require('os');
 const tls = require('tls');
 const { once } = require('events');
 const { fileURLToPath } = require('url');
 const { analyzePodcastDjStream, analyzePodcastDjIntro } = require('./dj-analyzer');
+
+// 生产环境静音调试日志（由 desktop/main.js 设置 XHEARTMUSIC_SILENT_LOGS=1）
+if (process.env.XHEARTMUSIC_SILENT_LOGS === '1') {
+  console.log = () => {};
+  console.info = () => {};
+  console.debug = () => {};
+}
 
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '127.0.0.1';
@@ -61,16 +69,16 @@ const COOKIE_FILE = process.env.COOKIE_FILE || path.join(__dirname, '.cookie');
 const QQ_COOKIE_FILE = process.env.QQ_COOKIE_FILE || path.join(__dirname, '.qq-cookie');
 const KUGOU_COOKIE_FILE = process.env.KUGOU_COOKIE_FILE || path.join(__dirname, '.kg-cookie');
 const QISHUI_COOKIE_FILE = process.env.QISHUI_COOKIE_FILE || path.join(__dirname, '.qishui-cookie');
-const UPDATE_WORK_DIR = process.env.MINERADIO_UPDATE_DIR || path.join(__dirname, 'updates');
-const UPDATE_DOWNLOAD_DIR = process.env.MINERADIO_UPDATE_DOWNLOAD_DIR || path.join(UPDATE_WORK_DIR, 'downloads');
-const UPDATE_PATCH_BACKUP_DIR = process.env.MINERADIO_PATCH_BACKUP_DIR || path.join(UPDATE_WORK_DIR, 'backups', 'patches');
-const BEATMAP_CACHE_DIR = process.env.MINERADIO_BEAT_CACHE_DIR || path.join(__dirname, 'beatmaps');
+const UPDATE_WORK_DIR = process.env.XHEARTMUSIC_UPDATE_DIR || path.join(__dirname, 'updates');
+const UPDATE_DOWNLOAD_DIR = process.env.XHEARTMUSIC_UPDATE_DOWNLOAD_DIR || path.join(UPDATE_WORK_DIR, 'downloads');
+const UPDATE_PATCH_BACKUP_DIR = process.env.XHEARTMUSIC_PATCH_BACKUP_DIR || path.join(UPDATE_WORK_DIR, 'backups', 'patches');
+const BEATMAP_CACHE_DIR = process.env.XHEARTMUSIC_BEAT_CACHE_DIR || path.join(__dirname, 'beatmaps');
 const APP_PACKAGE = readPackageInfo();
-const APP_VERSION = process.env.MINERADIO_VERSION || APP_PACKAGE.version || '0.9.11';
+const APP_VERSION = process.env.XHEARTMUSIC_VERSION || APP_PACKAGE.version || '0.9.11';
 const UPDATE_CONFIG = readUpdateConfig(APP_PACKAGE);
 const PATCH_MAX_BYTES = 12 * 1024 * 1024;
 const PATCH_ALLOWED_ROOTS = new Set(['public', 'desktop', 'build']);
-const PATCH_ALLOWED_FILES = new Set(['server.js', 'dj-analyzer.js', 'package.json', 'package-lock.json']);
+const PATCH_ALLOWED_FILES = new Set(['package.json', 'package-lock.json']);
 const UPDATE_FALLBACK_NOTES = [
   '电影镜头节奏更松',
   '音源失败自动换源',
@@ -78,7 +86,7 @@ const UPDATE_FALLBACK_NOTES = [
 ];
 const OPEN_METEO_FORECAST_URL = 'https://api.open-meteo.com/v1/forecast';
 const OPEN_METEO_GEOCODE_URL = 'https://geocoding-api.open-meteo.com/v1/search';
-const WEATHER_IP_LOCATION_URL = 'http://ip-api.com/json/';
+const WEATHER_IP_LOCATION_URL = 'https://ipwho.is/';
 const WEATHER_DEFAULT_LOCATION = {
   name: '上海',
   country: 'China',
@@ -122,7 +130,58 @@ const MIME = {
 };
 
 // ---------- Cookie 持久化 ----------
+// 本地 cookie 文件采用 AES-256-GCM 加密 + 原子写入，密钥派生自机器标识。
+// 旧版明文文件读取时自动兼容（见 decryptCookieBlob）。
 const COOKIE_ATTRIBUTE_NAMES = new Set(['path', 'domain', 'expires', 'max-age', 'samesite', 'secure', 'httponly']);
+const COOKIE_ENC_MAGIC = Buffer.from('XHM1');
+const COOKIE_ENC_SALT = Buffer.from('xheartmusic-cookie-v1-salt');
+let cookieEncKey = null;
+function getCookieEncKey() {
+  if (cookieEncKey) return cookieEncKey;
+  const user = (os.userInfo && os.userInfo().username) || '';
+  const machine = os.hostname() || '';
+  const seed = machine + '\0' + user + '\0' + __dirname;
+  cookieEncKey = crypto.scryptSync(seed, COOKIE_ENC_SALT, 32);
+  return cookieEncKey;
+}
+function encryptCookieBlob(text) {
+  const key = getCookieEncKey();
+  const iv = crypto.randomBytes(12);
+  const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+  const enc = Buffer.concat([cipher.update(text, 'utf8'), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return Buffer.concat([COOKIE_ENC_MAGIC, iv, enc, tag]);
+}
+function decryptCookieBlob(buf) {
+  if (!buf || buf.length < 4 + 12 + 16) {
+    return buf ? buf.toString('utf8').trim() : '';
+  }
+  if (!buf.slice(0, 4).equals(COOKIE_ENC_MAGIC)) {
+    return buf.toString('utf8').trim();
+  }
+  try {
+    const key = getCookieEncKey();
+    const iv = buf.slice(4, 16);
+    const tag = buf.slice(buf.length - 16);
+    const enc = buf.slice(16, buf.length - 16);
+    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
+    decipher.setAuthTag(tag);
+    const dec = Buffer.concat([decipher.update(enc), decipher.final()]);
+    return dec.toString('utf8').trim();
+  } catch (e) {
+    return '';
+  }
+}
+function writeCookieFile(file, text) {
+  const buf = encryptCookieBlob(text);
+  const tmp = file + '.tmp';
+  fs.writeFileSync(tmp, buf);
+  fs.renameSync(tmp, file);
+}
+function readCookieFile(file) {
+  if (!fs.existsSync(file)) return '';
+  return decryptCookieBlob(fs.readFileSync(file));
+}
 function collectCookiePair(picked, key, value) {
   key = String(key || '').trim();
   if (!key || COOKIE_ATTRIBUTE_NAMES.has(key.toLowerCase())) return;
@@ -173,35 +232,31 @@ function rawCookieFallback(input) {
   return '';
 }
 let userCookie = '';
-try { if (fs.existsSync(COOKIE_FILE)) userCookie = fs.readFileSync(COOKIE_FILE, 'utf8').trim(); }
-catch (e) { userCookie = ''; }
+try { userCookie = readCookieFile(COOKIE_FILE); } catch (e) { userCookie = ''; }
 function saveCookie(c) {
   userCookie = normalizeCookieHeader(c) || rawCookieFallback(c);
-  try { fs.writeFileSync(COOKIE_FILE, userCookie); } catch (e) {}
+  try { writeCookieFile(COOKIE_FILE, userCookie); } catch (e) {}
 }
 
 let qqCookie = '';
-try { if (fs.existsSync(QQ_COOKIE_FILE)) qqCookie = fs.readFileSync(QQ_COOKIE_FILE, 'utf8').trim(); }
-catch (e) { qqCookie = ''; }
+try { qqCookie = readCookieFile(QQ_COOKIE_FILE); } catch (e) { qqCookie = ''; }
 function saveQQCookie(c) {
   qqCookie = normalizeCookieHeader(c) || rawCookieFallback(c);
-  try { fs.writeFileSync(QQ_COOKIE_FILE, qqCookie); } catch (e) {}
+  try { writeCookieFile(QQ_COOKIE_FILE, qqCookie); } catch (e) {}
 }
 
 let kgCookie = '';
-try { if (fs.existsSync(KUGOU_COOKIE_FILE)) kgCookie = fs.readFileSync(KUGOU_COOKIE_FILE, 'utf8').trim(); }
-catch (e) { kgCookie = ''; }
+try { kgCookie = readCookieFile(KUGOU_COOKIE_FILE); } catch (e) { kgCookie = ''; }
 function saveKGCookie(c) {
   kgCookie = normalizeCookieHeader(c) || rawCookieFallback(c);
-  try { fs.writeFileSync(KUGOU_COOKIE_FILE, kgCookie); } catch (e) {}
+  try { writeCookieFile(KUGOU_COOKIE_FILE, kgCookie); } catch (e) {}
 }
 
 let qishuiCookie = '';
-try { if (fs.existsSync(QISHUI_COOKIE_FILE)) qishuiCookie = fs.readFileSync(QISHUI_COOKIE_FILE, 'utf8').trim(); }
-catch (e) { qishuiCookie = ''; }
+try { qishuiCookie = readCookieFile(QISHUI_COOKIE_FILE); } catch (e) { qishuiCookie = ''; }
 function saveQishuiCookie(c) {
   qishuiCookie = normalizeCookieHeader(c) || rawCookieFallback(c);
-  try { fs.writeFileSync(QISHUI_COOKIE_FILE, qishuiCookie); } catch (e) {}
+  try { writeCookieFile(QISHUI_COOKIE_FILE, qishuiCookie); } catch (e) {}
 }
 
 // ---------- 工具 ----------
@@ -242,15 +297,15 @@ function parseGitHubRepository(input) {
 }
 function readUpdateConfig(pkg) {
   const local = (pkg && pkg.xheartmusic && pkg.xheartmusic.update) || {};
-  const repoHint = process.env.MINERADIO_UPDATE_REPOSITORY
+  const repoHint = process.env.XHEARTMUSIC_UPDATE_REPOSITORY
     || process.env.GITHUB_REPOSITORY
     || local.repository
     || local.github
     || (pkg && pkg.repository && (pkg.repository.url || pkg.repository))
     || '';
   const parsed = parseGitHubRepository(repoHint) || {};
-  const owner = process.env.MINERADIO_UPDATE_OWNER || local.owner || parsed.owner || '';
-  const repo = process.env.MINERADIO_UPDATE_REPO || local.repo || parsed.repo || '';
+  const owner = process.env.XHEARTMUSIC_UPDATE_OWNER || local.owner || parsed.owner || '';
+  const repo = process.env.XHEARTMUSIC_UPDATE_REPO || local.repo || parsed.repo || '';
   return {
     provider: local.provider || 'github',
     owner,
@@ -259,9 +314,9 @@ function readUpdateConfig(pkg) {
     preview: local.preview !== false,
     preferMirrors: local.preferMirrors !== false,
     mirrors: readUpdateMirrors(local),
-    manifest: process.env.MINERADIO_UPDATE_MANIFEST
-      || process.env.MINERADIO_UPDATE_MANIFEST_URL
-      || process.env.MINERADIO_UPDATE_MANIFEST_FILE
+    manifest: process.env.XHEARTMUSIC_UPDATE_MANIFEST
+      || process.env.XHEARTMUSIC_UPDATE_MANIFEST_URL
+      || process.env.XHEARTMUSIC_UPDATE_MANIFEST_FILE
       || '',
   };
 }
@@ -270,7 +325,7 @@ function parseUpdateMirrorList(value) {
   return String(value || '').split(/[\n,;]/);
 }
 function readUpdateMirrors(local) {
-  const envMirrors = process.env.MINERADIO_UPDATE_MIRRORS || process.env.MINERADIO_UPDATE_MIRROR || '';
+  const envMirrors = process.env.XHEARTMUSIC_UPDATE_MIRRORS || process.env.XHEARTMUSIC_UPDATE_MIRROR || '';
   const raw = envMirrors
     ? parseUpdateMirrorList(envMirrors)
     : parseUpdateMirrorList(local.mirrors || local.downloadMirrors || []);
@@ -2020,23 +2075,22 @@ async function fetchOpenMeteoWeather(params) {
 
 async function fetchIpWeatherLocation() {
   const u = new URL(WEATHER_IP_LOCATION_URL);
-  u.searchParams.set('fields', 'status,message,country,regionName,city,lat,lon,timezone,query');
-  u.searchParams.set('lang', 'zh-CN');
   const body = await requestJson(u.toString(), { headers: { 'User-Agent': UA } });
-  if (!body || body.status !== 'success' || !Number.isFinite(Number(body.lat)) || !Number.isFinite(Number(body.lon))) {
+  if (!body || body.success !== true || !Number.isFinite(Number(body.latitude)) || !Number.isFinite(Number(body.longitude))) {
     const err = new Error(body && body.message || 'IP_LOCATION_FAILED');
     err.body = body;
     throw err;
   }
+  const tz = body.timezone && (body.timezone.id || body.timezone.utc) || 'auto';
   return {
-    provider: 'ip-api',
+    provider: 'ipwho.is',
     city: body.city || WEATHER_DEFAULT_LOCATION.name,
-    region: body.regionName || '',
+    region: body.region || '',
     country: body.country || '',
-    latitude: Number(body.lat),
-    longitude: Number(body.lon),
-    timezone: body.timezone || 'auto',
-    ip: body.query || '',
+    latitude: Number(body.latitude),
+    longitude: Number(body.longitude),
+    timezone: tz,
+    ip: body.ip || '',
   };
 }
 
