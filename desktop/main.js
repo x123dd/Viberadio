@@ -1589,6 +1589,7 @@ async function createWindow() {
   process.env.KUGOU_COOKIE_FILE = path.join(app.getPath('userData'), '.kg-cookie');
   process.env.QISHUI_COOKIE_FILE = path.join(app.getPath('userData'), '.qishui-cookie');
   process.env.MINERADIO_UPDATE_DIR = getUpdateDownloadDir();
+  process.env.MINERADIO_BEAT_CACHE_DIR = path.join(app.getPath('userData'), 'beatmaps');
   try {
     const legacyQQCookie = path.join(__dirname, '..', '.qq-cookie');
     if (fs.existsSync(legacyQQCookie)) {
