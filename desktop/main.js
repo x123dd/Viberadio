@@ -416,9 +416,19 @@ function isKuGouCookieDomain(domain) {
 
 function kgCookieHasLogin(cookieText) {
   const obj = parseCookieHeader(cookieText);
-  const userId = obj.userid || obj.kg_mid || obj.kg_m || '';
+  const rawUin = obj.userid || obj.kg_mid || obj.kg_m || '';
+  const uin = String(rawUin).replace(/\D/g, '');
+  // 基础登录：有 userid 即算登录痕迹（token 可能尚未下发）
+  return !!uin;
+}
+
+function kgCookieHasPlaybackLogin(cookieText) {
+  const obj = parseCookieHeader(cookieText);
+  const rawUin = obj.userid || obj.kg_mid || obj.kg_m || '';
+  const uin = String(rawUin).replace(/\D/g, '');
   const token = obj.token || obj.kg_mid_token || obj.kugou_token || '';
-  return !!(String(userId).replace(/\D/g, '') && token);
+  // 播放登录：userid + token
+  return !!(uin && token);
 }
 
 async function readKgLoginCookieHeader(cookieSession) {
@@ -435,7 +445,15 @@ function isQishuiCookieDomain(domain) {
 function qishuiCookieHasLogin(cookieText) {
   const obj = parseCookieHeader(cookieText);
   const uid = obj.douyin_uid || obj.uid || obj.user_id || '';
+  // 基础登录：有 uid 即算登录痕迹（session 可能尚未下发）
+  return !!uid;
+}
+
+function qishuiCookieHasPlaybackLogin(cookieText) {
+  const obj = parseCookieHeader(cookieText);
+  const uid = obj.douyin_uid || obj.uid || obj.user_id || '';
   const session = obj.sessionid || obj.session_id || obj.SESSIONID || '';
+  // 播放登录：uid + sessionid
   return !!(uid && session);
 }
 
@@ -650,11 +668,12 @@ async function openQQMusicLoginWindow(owner) {
 async function openKgMusicLoginWindow(owner) {
   const cookieSession = session.fromPartition(KG_LOGIN_PARTITION);
   const initialCookie = await readKgLoginCookieHeader(cookieSession);
-  if (kgCookieHasLogin(initialCookie)) return { ok: true, cookie: initialCookie, reused: true };
+  if (kgCookieHasPlaybackLogin(initialCookie)) return { ok: true, cookie: initialCookie, reused: true };
 
   return new Promise((resolve) => {
     let settled = false;
     let pollTimer = null;
+    let warmupStarted = false;
 
     const loginWindow = new BrowserWindow({
       width: 900,
@@ -689,8 +708,15 @@ async function openKgMusicLoginWindow(owner) {
     const checkCookies = async () => {
       try {
         const cookie = await readKgLoginCookieHeader(cookieSession);
-        if (kgCookieHasLogin(cookie)) {
+        if (kgCookieHasPlaybackLogin(cookie)) {
           finish({ ok: true, cookie });
+        } else if (kgCookieHasLogin(cookie) && !warmupStarted) {
+          warmupStarted = true;
+          setTimeout(() => {
+            if (!settled && loginWindow && !loginWindow.isDestroyed()) {
+              loginWindow.loadURL('https://www.kugou.com/').catch((e) => console.warn('KuGou login warmup navigation failed:', e.message));
+            }
+          }, 900);
         }
       } catch (e) {
         console.warn('KuGou login cookie check failed:', e.message);
@@ -744,11 +770,12 @@ async function openKgMusicLoginWindow(owner) {
 async function openQishuiMusicLoginWindow(owner) {
   const cookieSession = session.fromPartition(QISHUI_LOGIN_PARTITION);
   const initialCookie = await readQishuiLoginCookieHeader(cookieSession);
-  if (qishuiCookieHasLogin(initialCookie)) return { ok: true, cookie: initialCookie, reused: true };
+  if (qishuiCookieHasPlaybackLogin(initialCookie)) return { ok: true, cookie: initialCookie, reused: true };
 
   return new Promise((resolve) => {
     let settled = false;
     let pollTimer = null;
+    let warmupStarted = false;
 
     const loginWindow = new BrowserWindow({
       width: 860,
@@ -783,8 +810,15 @@ async function openQishuiMusicLoginWindow(owner) {
     const checkCookies = async () => {
       try {
         const cookie = await readQishuiLoginCookieHeader(cookieSession);
-        if (qishuiCookieHasLogin(cookie)) {
+        if (qishuiCookieHasPlaybackLogin(cookie)) {
           finish({ ok: true, cookie });
+        } else if (qishuiCookieHasLogin(cookie) && !warmupStarted) {
+          warmupStarted = true;
+          setTimeout(() => {
+            if (!settled && loginWindow && !loginWindow.isDestroyed()) {
+              loginWindow.loadURL('https://qishui.douyin.com/').catch((e) => console.warn('Qishui login warmup navigation failed:', e.message));
+            }
+          }, 900);
         }
       } catch (e) {
         console.warn('Qishui login cookie check failed:', e.message);
