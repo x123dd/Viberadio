@@ -26957,6 +26957,33 @@ function applyWallpaperModeState(force) {
   }
   pushWallpaperState(!!force);
 }
+var wallpaperPushTimer = 0;
+function pushWallpaperAudioState(now) {
+  if (!fx.wallpaperMode) return;
+  if (now - wallpaperPushTimer < 50) return; // 20fps push
+  wallpaperPushTimer = now;
+
+  var freqData = null;
+  if (audioAnalyser && playing && audio && !audio.paused) {
+    if (!audioFreqArray) audioFreqArray = new Uint8Array(audioAnalyser.frequencyBinCount || 64);
+    try { audioAnalyser.getByteFrequencyData(audioFreqArray); freqData = Array.from(audioFreqArray.slice(0, 64)); }
+    catch (e) { /* analyser may not be ready */ }
+  }
+
+  fetch('/api/wallpaper/push', {
+    method: 'POST',
+    body: JSON.stringify({
+      playing: playing,
+      title: (playQueue[currentIdx] && playQueue[currentIdx].name) || '',
+      artist: (playQueue[currentIdx] && playQueue[currentIdx].artist) || '',
+      cover: currentCoverUrl || '',
+      frequencyData: freqData,
+      primaryColor: (typeof uniforms !== 'undefined' && uniforms.uColor1) ? uniforms.uColor1.value : '#d6f8ff',
+      secondaryColor: (typeof uniforms !== 'undefined' && uniforms.uColor2) ? uniforms.uColor2.value : '#9cffdf',
+    }),
+    headers: { 'Content-Type': 'application/json' },
+  }).catch(function(){}); // silent
+}
 function syncDesktopOverlayState() {
   if (fx.desktopLyrics) pushDesktopLyricsState(false);
   if (fx.wallpaperMode) pushWallpaperState(false);
@@ -27219,6 +27246,7 @@ function animate() {
   var dt = Math.min((now - prevTime) / 1000, 0.05);
   prevTime = now;
   sampleRenderPerf(now, dt);
+  pushWallpaperAudioState(now);
   uniforms.uTime.value += dt;
   if (isMainSceneCoveredBySplash()) {
     if (now - splashWarmRenderLast > 520) {
