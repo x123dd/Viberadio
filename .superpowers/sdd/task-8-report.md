@@ -6,7 +6,7 @@
 
 ## Fix 1 (CRITICAL): `playNext()` replaced with `nextTrack` in preResolvedUrl onended handler
 
-**File:** `D:\Desktop\XHeartMusic-1.1.1\public\index.html`  
+**File:** `D:\Desktop\Viberadio-1.1.1\public\index.html`  
 **Line:** 18655-18656
 
 **Before:**
@@ -27,7 +27,7 @@ else setTimeout(nextTrack, 0);
 
 ## Fix 2 (IMPORTANT): `artistNameParts` fallback in `clientSideFallback` query construction
 
-**File:** `D:\Desktop\XHeartMusic-1.1.1\public\index.html`  
+**File:** `D:\Desktop\Viberadio-1.1.1\public\index.html`  
 **Line:** 18460
 
 **Before:**
@@ -46,7 +46,7 @@ var query = [song.name || song.title || '', song.artist || (artistNameParts(song
 
 ## Fix 3 (IMPORTANT): `res.flushHeaders()` after SSE writeHead
 
-**File:** `D:\Desktop\XHeartMusic-1.1.1\server.js`  
+**File:** `D:\Desktop\Viberadio-1.1.1\server.js`  
 **Line:** 5347
 
 **Before:**
@@ -82,7 +82,7 @@ var heartbeat = setInterval(function() {
 
 ## Fix 4 (IMPORTANT): Added `'` (LEFT SINGLE QUOTATION MARK, U+2018) to `normalizeMatchText` regex
 
-**File:** `D:\Desktop\XHeartMusic-1.1.1\server.js`  
+**File:** `D:\Desktop\Viberadio-1.1.1\server.js`  
 **Line:** 3340
 
 **Before:**
@@ -97,7 +97,7 @@ var heartbeat = setInterval(function() {
 
 **Rationale:** The character class already contained `'` (U+2019, right single quote), `"` (U+201C, left double quote), and `"` (U+201D, right double quote), but was missing `'` (U+2018, left single quotation mark). Added between `"` and `"`.
 
-**File:** `D:\Desktop\XHeartMusic-1.1.1\public\index.html`  
+**File:** `D:\Desktop\Viberadio-1.1.1\public\index.html`  
 **Line:** 18325
 
 **Before:**

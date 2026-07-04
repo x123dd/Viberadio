@@ -19,18 +19,18 @@ jobs:
 
       - name: Reassemble installer
         run: |
-          cat .release-chunks/exe.part* release-parts/exe.part* > XHeartMusic-1.1.1-Setup.exe
-          cp dist/XHeartMusic-1.1.1-Setup.exe.blockmap .
-          cp dist/XHeartMusic-1.1.1-SHA256SUMS.txt .
-          sha256sum XHeartMusic-1.1.1-Setup.exe
+          cat .release-chunks/exe.part* release-parts/exe.part* > Viberadio-1.1.1-Setup.exe
+          cp dist/Viberadio-1.1.1-Setup.exe.blockmap .
+          cp dist/Viberadio-1.1.1-SHA256SUMS.txt .
+          sha256sum Viberadio-1.1.1-Setup.exe
 
       - name: Upload to Release
         run: |
           gh release upload v1.1.1 \
-            XHeartMusic-1.1.1-Setup.exe \
-            XHeartMusic-1.1.1-Setup.exe.blockmap \
-            XHeartMusic-1.1.1-SHA256SUMS.txt \
-            --repo x123dd/XHeartMusic \
+            Viberadio-1.1.1-Setup.exe \
+            Viberadio-1.1.1-Setup.exe.blockmap \
+            Viberadio-1.1.1-SHA256SUMS.txt \
+            --repo x123dd/Viberadio \
             --clobber
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -27,7 +27,7 @@
 !endif
 !ifndef BUILD_UNINSTALLER
   !ifndef MUI_CUSTOMFUNCTION_GUIINIT
-    !define MUI_CUSTOMFUNCTION_GUIINIT MineradioGuiInit
+    !define MUI_CUSTOMFUNCTION_GUIINIT ViberadioGuiInit
   !endif
 !endif
 
@@ -37,43 +37,43 @@
 !include nsDialogs.nsh
 !include WinMessages.nsh
 
-!define MINERADIO_INSTALL_MARKER ".mineradio-install-root"
+!define VIBERADIO_INSTALL_MARKER ".viberadio-install-root"
 
 !ifndef BUILD_UNINSTALLER
-  Var MineradioWelcomePage
-  Var MineradioHeroFont
-  Var MineradioTitleFont
-  Var MineradioBodyFont
-  Var MineradioSmallFont
-  Var MineradioDirectoryPage
-  Var MineradioDirectoryInput
+  Var ViberadioWelcomePage
+  Var ViberadioHeroFont
+  Var ViberadioTitleFont
+  Var ViberadioBodyFont
+  Var ViberadioSmallFont
+  Var ViberadioDirectoryPage
+  Var ViberadioDirectoryInput
 !endif
 
 !macro customInit
   !ifndef BUILD_UNINSTALLER
-    Call MineradioUsePreferredInstallDir
-    Call MineradioDisableUnsafeOldUninstallers
+    Call ViberadioUsePreferredInstallDir
+    Call ViberadioDisableUnsafeOldUninstallers
     ${If} ${Silent}
-      Call MineradioValidateInstallDir
+      Call ViberadioValidateInstallDir
     ${EndIf}
   !endif
 !macroend
 
 !macro customInstall
-  FileOpen $0 "$INSTDIR\${MINERADIO_INSTALL_MARKER}" w
+  FileOpen $0 "$INSTDIR\${VIBERADIO_INSTALL_MARKER}" w
   ${IfNot} ${Errors}
-    FileWrite $0 "Mineradio install root$\r$\n"
-    FileWrite $0 "appId=com.mineradio.desktop$\r$\n"
+    FileWrite $0 "Viberadio install root$\r$\n"
+    FileWrite $0 "appId=com.viberadio.desktop$\r$\n"
     FileClose $0
   ${EndIf}
 !macroend
 
 !macro customRemoveFiles
-  Call un.MineradioRemoveInstalledFiles
+  Call un.ViberadioRemoveInstalledFiles
 !macroend
 
 !macro customWelcomePage
-  Page custom MineradioWelcomeShow
+  Page custom ViberadioWelcomeShow
 !macroend
 
 !macro customInstallMode
@@ -81,12 +81,12 @@
 !macroend
 
 !macro customPageAfterChangeDir
-  Page custom MineradioDirectoryShow MineradioDirectoryLeave
+  Page custom ViberadioDirectoryShow ViberadioDirectoryLeave
 !macroend
 
 !macro customFinishPage
   !ifndef HIDE_RUN_AFTER_FINISH
-    Function MineradioFinishStartApp
+    Function ViberadioFinishStartApp
       ${If} ${isUpdated}
         StrCpy $1 "--updated"
       ${Else}
@@ -96,20 +96,20 @@
     FunctionEnd
 
     !define MUI_FINISHPAGE_RUN
-    !define MUI_FINISHPAGE_RUN_FUNCTION "MineradioFinishStartApp"
+    !define MUI_FINISHPAGE_RUN_FUNCTION "ViberadioFinishStartApp"
   !endif
-  !define MUI_PAGE_CUSTOMFUNCTION_SHOW MineradioTintCommonControls
+  !define MUI_PAGE_CUSTOMFUNCTION_SHOW ViberadioTintCommonControls
   !insertmacro MUI_PAGE_FINISH
 !macroend
 
 !ifndef BUILD_UNINSTALLER
-Function MineradioGuiInit
+Function ViberadioGuiInit
   System::Call 'dwmapi::DwmSetWindowAttribute(p $HWNDPARENT, i 20, *i 1, i 4) i .r0'
   System::Call 'dwmapi::DwmSetWindowAttribute(p $HWNDPARENT, i 19, *i 1, i 4) i .r0'
-  Call MineradioTintCommonControls
+  Call ViberadioTintCommonControls
 FunctionEnd
 
-Function MineradioTintCommonControls
+Function ViberadioTintCommonControls
   SetCtlColors $HWNDPARENT "111217" "FFFFFF"
 
   GetDlgItem $0 $HWNDPARENT 1
@@ -217,7 +217,7 @@ Function MineradioTintCommonControls
   ${EndIf}
 FunctionEnd
 
-Function MineradioUsePreferredInstallDir
+Function ViberadioUsePreferredInstallDir
   ${GetParameters} $R0
   ClearErrors
   ${GetOptions} $R0 "/D=" $R1
@@ -225,18 +225,18 @@ Function MineradioUsePreferredInstallDir
   ${AndIf} $R1 != ""
     StrCpy $INSTDIR "$R1"
   ${Else}
-    Call MineradioUseRegisteredInstallDir
+    Call ViberadioUseRegisteredInstallDir
     Pop $R2
     ${If} $R2 != "1"
-      Call MineradioUseFirstAvailableInstallDir
+      Call ViberadioUseFirstAvailableInstallDir
     ${EndIf}
   ${EndIf}
   Push "$INSTDIR"
-  Call MineradioNormalizeInstallDir
+  Call ViberadioNormalizeInstallDir
   Pop $INSTDIR
 FunctionEnd
 
-Function MineradioUseFirstAvailableInstallDir
+Function ViberadioUseFirstAvailableInstallDir
   IfFileExists "D:\*.*" driveD 0
   IfFileExists "E:\*.*" driveE 0
   IfFileExists "F:\*.*" driveF 0
@@ -260,81 +260,81 @@ Function MineradioUseFirstAvailableInstallDir
   IfFileExists "X:\*.*" driveX 0
   IfFileExists "Y:\*.*" driveY 0
   IfFileExists "Z:\*.*" driveZ 0
-  StrCpy $INSTDIR "C:\Mineradio"
+  StrCpy $INSTDIR "C:\Viberadio"
   Return
 
   driveD:
-    StrCpy $INSTDIR "D:\Mineradio"
+    StrCpy $INSTDIR "D:\Viberadio"
     Return
   driveE:
-    StrCpy $INSTDIR "E:\Mineradio"
+    StrCpy $INSTDIR "E:\Viberadio"
     Return
   driveF:
-    StrCpy $INSTDIR "F:\Mineradio"
+    StrCpy $INSTDIR "F:\Viberadio"
     Return
   driveG:
-    StrCpy $INSTDIR "G:\Mineradio"
+    StrCpy $INSTDIR "G:\Viberadio"
     Return
   driveH:
-    StrCpy $INSTDIR "H:\Mineradio"
+    StrCpy $INSTDIR "H:\Viberadio"
     Return
   driveI:
-    StrCpy $INSTDIR "I:\Mineradio"
+    StrCpy $INSTDIR "I:\Viberadio"
     Return
   driveJ:
-    StrCpy $INSTDIR "J:\Mineradio"
+    StrCpy $INSTDIR "J:\Viberadio"
     Return
   driveK:
-    StrCpy $INSTDIR "K:\Mineradio"
+    StrCpy $INSTDIR "K:\Viberadio"
     Return
   driveL:
-    StrCpy $INSTDIR "L:\Mineradio"
+    StrCpy $INSTDIR "L:\Viberadio"
     Return
   driveM:
-    StrCpy $INSTDIR "M:\Mineradio"
+    StrCpy $INSTDIR "M:\Viberadio"
     Return
   driveN:
-    StrCpy $INSTDIR "N:\Mineradio"
+    StrCpy $INSTDIR "N:\Viberadio"
     Return
   driveO:
-    StrCpy $INSTDIR "O:\Mineradio"
+    StrCpy $INSTDIR "O:\Viberadio"
     Return
   driveP:
-    StrCpy $INSTDIR "P:\Mineradio"
+    StrCpy $INSTDIR "P:\Viberadio"
     Return
   driveQ:
-    StrCpy $INSTDIR "Q:\Mineradio"
+    StrCpy $INSTDIR "Q:\Viberadio"
     Return
   driveR:
-    StrCpy $INSTDIR "R:\Mineradio"
+    StrCpy $INSTDIR "R:\Viberadio"
     Return
   driveS:
-    StrCpy $INSTDIR "S:\Mineradio"
+    StrCpy $INSTDIR "S:\Viberadio"
     Return
   driveT:
-    StrCpy $INSTDIR "T:\Mineradio"
+    StrCpy $INSTDIR "T:\Viberadio"
     Return
   driveU:
-    StrCpy $INSTDIR "U:\Mineradio"
+    StrCpy $INSTDIR "U:\Viberadio"
     Return
   driveV:
-    StrCpy $INSTDIR "V:\Mineradio"
+    StrCpy $INSTDIR "V:\Viberadio"
     Return
   driveW:
-    StrCpy $INSTDIR "W:\Mineradio"
+    StrCpy $INSTDIR "W:\Viberadio"
     Return
   driveX:
-    StrCpy $INSTDIR "X:\Mineradio"
+    StrCpy $INSTDIR "X:\Viberadio"
     Return
   driveY:
-    StrCpy $INSTDIR "Y:\Mineradio"
+    StrCpy $INSTDIR "Y:\Viberadio"
     Return
   driveZ:
-    StrCpy $INSTDIR "Z:\Mineradio"
+    StrCpy $INSTDIR "Z:\Viberadio"
     Return
 FunctionEnd
 
-Function MineradioHasPreferredInstallDrive
+Function ViberadioHasPreferredInstallDrive
   IfFileExists "D:\*.*" hasPreferred 0
   IfFileExists "E:\*.*" hasPreferred 0
   IfFileExists "F:\*.*" hasPreferred 0
@@ -366,37 +366,37 @@ Function MineradioHasPreferredInstallDrive
     Return
 FunctionEnd
 
-Function MineradioNormalizeInstallDir
+Function ViberadioNormalizeInstallDir
   Exch $0
   Push "$0"
-  Call MineradioTrimInstallDir
+  Call ViberadioTrimInstallDir
   Pop $0
   StrLen $1 "$0"
   ${If} $1 == 2
     StrCpy $2 "$0" 1 1
     ${If} $2 == ":"
-      StrCpy $0 "$0\Mineradio"
+      StrCpy $0 "$0\Viberadio"
     ${EndIf}
   ${ElseIf} $1 == 3
     StrCpy $2 "$0" 1 1
     StrCpy $3 "$0" 1 2
     ${If} $2 == ":"
     ${AndIf} $3 == "\"
-      StrCpy $0 "$0Mineradio"
+      StrCpy $0 "$0Viberadio"
     ${EndIf}
   ${EndIf}
 
   StrLen $1 "$0"
   StrCpy $2 "$0" 10 -10
   ${If} $1 < 10
-  ${OrIf} $2 != "\Mineradio"
-  ${AndIf} $2 != "\mineradio"
-    StrCpy $0 "$0\Mineradio"
+  ${OrIf} $2 != "\Viberadio"
+  ${AndIf} $2 != "\viberadio"
+    StrCpy $0 "$0\Viberadio"
   ${EndIf}
   Exch $0
 FunctionEnd
 
-Function MineradioTrimInstallDir
+Function ViberadioTrimInstallDir
   Exch $0
 
   trim:
@@ -412,18 +412,18 @@ Function MineradioTrimInstallDir
   Exch $0
 FunctionEnd
 
-Function MineradioInstallDirLooksOwned
+Function ViberadioInstallDirLooksOwned
   Exch $0
   StrCpy $1 "0"
 
-  IfFileExists "$0\${MINERADIO_INSTALL_MARKER}" 0 +2
+  IfFileExists "$0\${VIBERADIO_INSTALL_MARKER}" 0 +2
     StrCpy $1 "1"
 
   StrCpy $0 "$1"
   Exch $0
 FunctionEnd
 
-Function MineradioExistingInstallPathCanBeAdopted
+Function ViberadioExistingInstallPathCanBeAdopted
   Exch $0
   StrCpy $1 "0"
 
@@ -432,21 +432,21 @@ Function MineradioExistingInstallPathCanBeAdopted
   ${EndIf}
 
   Push "$0"
-  Call MineradioTrimInstallDir
+  Call ViberadioTrimInstallDir
   Pop $2
   ${If} $2 == ""
     Goto done
   ${EndIf}
 
   Push "$2"
-  Call MineradioNormalizeInstallDir
+  Call ViberadioNormalizeInstallDir
   Pop $3
   ${If} $2 != $3
     Goto done
   ${EndIf}
 
   IfFileExists "$2\*.*" 0 done
-  IfFileExists "$2\${MINERADIO_INSTALL_MARKER}" adopt 0
+  IfFileExists "$2\${VIBERADIO_INSTALL_MARKER}" adopt 0
   IfFileExists "$2\${PRODUCT_FILENAME}.exe" adopt 0
   IfFileExists "$2\resources\app.asar" adopt 0
   IfFileExists "$2\resources\app\package.json" adopt 0
@@ -461,14 +461,14 @@ Function MineradioExistingInstallPathCanBeAdopted
     Exch $0
 FunctionEnd
 
-Function MineradioUseRegisteredInstallDir
+Function ViberadioUseRegisteredInstallDir
   ReadRegStr $0 HKCU "Software\${APP_GUID}" InstallLocation
   Push "$0"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $1
   ${If} $1 == "1"
     Push "$0"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $INSTDIR
     Push "1"
     Return
@@ -476,11 +476,11 @@ Function MineradioUseRegisteredInstallDir
 
   ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_APP_KEY}" InstallLocation
   Push "$0"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $1
   ${If} $1 == "1"
     Push "$0"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $INSTDIR
     Push "1"
     Return
@@ -488,11 +488,11 @@ Function MineradioUseRegisteredInstallDir
 
   ReadRegStr $0 HKLM "Software\${APP_GUID}" InstallLocation
   Push "$0"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $1
   ${If} $1 == "1"
     Push "$0"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $INSTDIR
     Push "1"
     Return
@@ -500,11 +500,11 @@ Function MineradioUseRegisteredInstallDir
 
   ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_APP_KEY}" InstallLocation
   Push "$0"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $1
   ${If} $1 == "1"
     Push "$0"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $INSTDIR
     Push "1"
     Return
@@ -513,7 +513,7 @@ Function MineradioUseRegisteredInstallDir
   Push "0"
 FunctionEnd
 
-Function MineradioRegisteredInstallDirCanBeAdopted
+Function ViberadioRegisteredInstallDirCanBeAdopted
   Exch $0
   StrCpy $1 "0"
 
@@ -522,16 +522,16 @@ Function MineradioRegisteredInstallDirCanBeAdopted
   ${EndIf}
 
   Push "$0"
-  Call MineradioNormalizeInstallDir
+  Call ViberadioNormalizeInstallDir
   Pop $2
 
   ReadRegStr $3 HKCU "Software\${APP_GUID}" InstallLocation
   Push "$3"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $4
   ${If} $4 == "1"
     Push "$3"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $5
     ${If} $5 == $2
       StrCpy $1 "1"
@@ -541,11 +541,11 @@ Function MineradioRegisteredInstallDirCanBeAdopted
 
   ReadRegStr $3 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_APP_KEY}" InstallLocation
   Push "$3"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $4
   ${If} $4 == "1"
     Push "$3"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $5
     ${If} $5 == $2
       StrCpy $1 "1"
@@ -555,11 +555,11 @@ Function MineradioRegisteredInstallDirCanBeAdopted
 
   ReadRegStr $3 HKLM "Software\${APP_GUID}" InstallLocation
   Push "$3"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $4
   ${If} $4 == "1"
     Push "$3"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $5
     ${If} $5 == $2
       StrCpy $1 "1"
@@ -569,11 +569,11 @@ Function MineradioRegisteredInstallDirCanBeAdopted
 
   ReadRegStr $3 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_APP_KEY}" InstallLocation
   Push "$3"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $4
   ${If} $4 == "1"
     Push "$3"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $5
     ${If} $5 == $2
       StrCpy $1 "1"
@@ -586,7 +586,7 @@ Function MineradioRegisteredInstallDirCanBeAdopted
     Exch $0
 FunctionEnd
 
-Function MineradioInstallDirIsEmpty
+Function ViberadioInstallDirIsEmpty
   Exch $0
   FindFirst $1 $2 "$0\*.*"
   StrCpy $3 "1"
@@ -608,7 +608,7 @@ Function MineradioInstallDirIsEmpty
     Exch $0
 FunctionEnd
 
-Function MineradioOldInstallPathNeedsQuarantine
+Function ViberadioOldInstallPathNeedsQuarantine
   Exch $0
   StrCpy $1 "0"
 
@@ -617,10 +617,10 @@ Function MineradioOldInstallPathNeedsQuarantine
   ${EndIf}
 
   Push "$0"
-  Call MineradioTrimInstallDir
+  Call ViberadioTrimInstallDir
   Pop $2
   Push "$2"
-  Call MineradioNormalizeInstallDir
+  Call ViberadioNormalizeInstallDir
   Pop $3
 
   ${If} $2 != $3
@@ -628,9 +628,9 @@ Function MineradioOldInstallPathNeedsQuarantine
     Goto done
   ${EndIf}
 
-  IfFileExists "$2\${MINERADIO_INSTALL_MARKER}" done 0
+  IfFileExists "$2\${VIBERADIO_INSTALL_MARKER}" done 0
   Push "$2"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $4
   ${If} $4 == "1"
     Goto done
@@ -643,28 +643,28 @@ Function MineradioOldInstallPathNeedsQuarantine
     Exch $0
 FunctionEnd
 
-Function MineradioDisableUnsafeOldUninstallers
+Function ViberadioDisableUnsafeOldUninstallers
   StrCpy $2 "0"
 
   ReadRegStr $0 HKCU "Software\${APP_GUID}" InstallLocation
   Push "$0"
-  Call MineradioDeleteLegacyUninstallerFileIfMissingMarker
+  Call ViberadioDeleteLegacyUninstallerFileIfMissingMarker
   Push "$0"
-  Call MineradioOldInstallPathNeedsQuarantine
+  Call ViberadioOldInstallPathNeedsQuarantine
   Pop $1
   ${If} $1 == "1"
-    DetailPrint "Skip unsafe legacy Mineradio uninstaller: $0"
+    DetailPrint "Skip unsafe legacy Viberadio uninstaller: $0"
     StrCpy $2 "1"
   ${EndIf}
 
   ReadRegStr $0 HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_APP_KEY}" InstallLocation
   Push "$0"
-  Call MineradioDeleteLegacyUninstallerFileIfMissingMarker
+  Call ViberadioDeleteLegacyUninstallerFileIfMissingMarker
   Push "$0"
-  Call MineradioOldInstallPathNeedsQuarantine
+  Call ViberadioOldInstallPathNeedsQuarantine
   Pop $1
   ${If} $1 == "1"
-    DetailPrint "Skip unsafe legacy Mineradio uninstaller: $0"
+    DetailPrint "Skip unsafe legacy Viberadio uninstaller: $0"
     StrCpy $2 "1"
   ${EndIf}
 
@@ -677,23 +677,23 @@ Function MineradioDisableUnsafeOldUninstallers
 
   ReadRegStr $0 HKLM "Software\${APP_GUID}" InstallLocation
   Push "$0"
-  Call MineradioDeleteLegacyUninstallerFileIfMissingMarker
+  Call ViberadioDeleteLegacyUninstallerFileIfMissingMarker
   Push "$0"
-  Call MineradioOldInstallPathNeedsQuarantine
+  Call ViberadioOldInstallPathNeedsQuarantine
   Pop $1
   ${If} $1 == "1"
-    DetailPrint "Skip unsafe legacy Mineradio uninstaller: $0"
+    DetailPrint "Skip unsafe legacy Viberadio uninstaller: $0"
     StrCpy $2 "1"
   ${EndIf}
 
   ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${UNINSTALL_APP_KEY}" InstallLocation
   Push "$0"
-  Call MineradioDeleteLegacyUninstallerFileIfMissingMarker
+  Call ViberadioDeleteLegacyUninstallerFileIfMissingMarker
   Push "$0"
-  Call MineradioOldInstallPathNeedsQuarantine
+  Call ViberadioOldInstallPathNeedsQuarantine
   Pop $1
   ${If} $1 == "1"
-    DetailPrint "Skip unsafe legacy Mineradio uninstaller: $0"
+    DetailPrint "Skip unsafe legacy Viberadio uninstaller: $0"
     StrCpy $2 "1"
   ${EndIf}
 
@@ -703,15 +703,15 @@ Function MineradioDisableUnsafeOldUninstallers
   ${EndIf}
 FunctionEnd
 
-Function MineradioDeleteLegacyUninstallerFileIfMissingMarker
+Function ViberadioDeleteLegacyUninstallerFileIfMissingMarker
   Pop $0
   ${If} $0 != ""
     Push "$0"
-    Call MineradioTrimInstallDir
+    Call ViberadioTrimInstallDir
     Pop $1
     ${If} $1 != ""
-      IfFileExists "$1\${MINERADIO_INSTALL_MARKER}" done 0
-      DetailPrint "Remove legacy Mineradio uninstaller file: $1"
+      IfFileExists "$1\${VIBERADIO_INSTALL_MARKER}" done 0
+      DetailPrint "Remove legacy Viberadio uninstaller file: $1"
       Delete "$1\Uninstall ${PRODUCT_FILENAME}.exe"
     ${EndIf}
   ${EndIf}
@@ -719,17 +719,17 @@ Function MineradioDeleteLegacyUninstallerFileIfMissingMarker
   done:
 FunctionEnd
 
-Function MineradioValidateInstallDir
+Function ViberadioValidateInstallDir
   Push "$INSTDIR"
-  Call MineradioNormalizeInstallDir
+  Call ViberadioNormalizeInstallDir
   Pop $INSTDIR
 
   Push "$INSTDIR"
-  Call MineradioRegisteredInstallDirCanBeAdopted
+  Call ViberadioRegisteredInstallDirCanBeAdopted
   Pop $3
 
   Push "$INSTDIR"
-  Call MineradioExistingInstallPathCanBeAdopted
+  Call ViberadioExistingInstallPathCanBeAdopted
   Pop $4
 
   StrCpy $0 "$INSTDIR" 1 0
@@ -737,12 +737,12 @@ Function MineradioValidateInstallDir
   ${If} $1 == ":"
     ${If} $0 == "C"
     ${OrIf} $0 == "c"
-      Call MineradioHasPreferredInstallDrive
+      Call ViberadioHasPreferredInstallDrive
       Pop $2
       ${If} $2 == "1"
       ${AndIf} $3 != "1"
       ${AndIf} $4 != "1"
-        MessageBox MB_ICONSTOP|MB_OK "检测到这台电脑还有 D-Z 盘，Mineradio 不安装到 C 盘。请改选 D 盘或其它非 C 盘的 Mineradio 文件夹。$\r$\n$\r$\n如果电脑只有 C 盘，安装器会自动放行 C:\Mineradio。"
+        MessageBox MB_ICONSTOP|MB_OK "检测到这台电脑还有 D-Z 盘，Viberadio 不安装到 C 盘。请改选 D 盘或其它非 C 盘的 Viberadio 文件夹。$\r$\n$\r$\n如果电脑只有 C 盘，安装器会自动放行 C:\Viberadio。"
         Abort
       ${EndIf}
     ${EndIf}
@@ -751,16 +751,16 @@ Function MineradioValidateInstallDir
   StrLen $0 "$INSTDIR"
   StrCpy $1 "$INSTDIR" 10 -10
   ${If} $0 < 10
-  ${OrIf} $1 != "\Mineradio"
-  ${AndIf} $1 != "\mineradio"
-    MessageBox MB_ICONSTOP|MB_OK "安装目录必须是独立的 Mineradio 文件夹。请选择一个上级目录，安装器会自动创建 Mineradio 子文件夹。"
+  ${OrIf} $1 != "\Viberadio"
+  ${AndIf} $1 != "\viberadio"
+    MessageBox MB_ICONSTOP|MB_OK "安装目录必须是独立的 Viberadio 文件夹。请选择一个上级目录，安装器会自动创建 Viberadio 子文件夹。"
     Abort
   ${EndIf}
 
   IfFileExists "$INSTDIR\*.*" 0 valid
 
   Push "$INSTDIR"
-  Call MineradioInstallDirLooksOwned
+  Call ViberadioInstallDirLooksOwned
   Pop $0
   ${If} $0 == "1"
     Goto valid
@@ -775,181 +775,181 @@ Function MineradioValidateInstallDir
   ${EndIf}
 
   Push "$INSTDIR"
-  Call MineradioInstallDirIsEmpty
+  Call ViberadioInstallDirIsEmpty
   Pop $0
   ${If} $0 == "1"
     Goto valid
   ${EndIf}
 
-  MessageBox MB_ICONSTOP|MB_OK "为避免卸载时误删其它文件，Mineradio 不能安装到已有文件的非专属目录。请新建或选择一个空的 Mineradio 文件夹。$\r$\n$\r$\n当前路径：$INSTDIR"
+  MessageBox MB_ICONSTOP|MB_OK "为避免卸载时误删其它文件，Viberadio 不能安装到已有文件的非专属目录。请新建或选择一个空的 Viberadio 文件夹。$\r$\n$\r$\n当前路径：$INSTDIR"
   Abort
 
   valid:
 FunctionEnd
-Function MineradioWelcomeShow
-  Call MineradioUsePreferredInstallDir
+Function ViberadioWelcomeShow
+  Call ViberadioUsePreferredInstallDir
 
   nsDialogs::Create 1018
-  Pop $MineradioWelcomePage
-  ${If} $MineradioWelcomePage == error
+  Pop $ViberadioWelcomePage
+  ${If} $ViberadioWelcomePage == error
     Abort
   ${EndIf}
 
-  SetCtlColors $MineradioWelcomePage "111217" "FFFFFF"
-  CreateFont $MineradioHeroFont "Microsoft YaHei UI" 24 700
-  CreateFont $MineradioTitleFont "Microsoft YaHei UI" 11 700
-  CreateFont $MineradioBodyFont "Microsoft YaHei UI" 9 400
-  CreateFont $MineradioSmallFont "Microsoft YaHei UI" 8 400
+  SetCtlColors $ViberadioWelcomePage "111217" "FFFFFF"
+  CreateFont $ViberadioHeroFont "Microsoft YaHei UI" 24 700
+  CreateFont $ViberadioTitleFont "Microsoft YaHei UI" 11 700
+  CreateFont $ViberadioBodyFont "Microsoft YaHei UI" 9 400
+  CreateFont $ViberadioSmallFont "Microsoft YaHei UI" 8 400
 
-  ${NSD_CreateLabel} 22u 20u 82u 10u "MINERADIO"
+  ${NSD_CreateLabel} 22u 20u 82u 10u "VIBERADIO"
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioSmallFont 1
+  SendMessage $0 ${WM_SETFONT} $ViberadioSmallFont 1
   SetCtlColors $0 "3257F7" "FFFFFF"
 
-  ${NSD_CreateLabel} 22u 42u 226u 30u "Mineradio 安装"
+  ${NSD_CreateLabel} 22u 42u 226u 30u "Viberadio 安装"
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioHeroFont 1
+  SendMessage $0 ${WM_SETFONT} $ViberadioHeroFont 1
   SetCtlColors $0 "111217" "FFFFFF"
 
   ${NSD_CreateLabel} 22u 78u 36u 2u ""
   Pop $0
   SetCtlColors $0 "" "3257F7"
 
-  ${NSD_CreateLabel} 22u 96u 238u 24u "为这台电脑安装 Mineradio。默认安装到 D:\Mineradio，下一步可以自由选择其它位置。"
+  ${NSD_CreateLabel} 22u 96u 238u 24u "为这台电脑安装 Viberadio。默认安装到 D:\Viberadio，下一步可以自由选择其它位置。"
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioBodyFont 1
+  SendMessage $0 ${WM_SETFONT} $ViberadioBodyFont 1
   SetCtlColors $0 "4B5263" "FFFFFF"
 
   ${NSD_CreateLabel} 22u 130u 238u 12u "默认位置：$INSTDIR"
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioTitleFont 1
+  SendMessage $0 ${WM_SETFONT} $ViberadioTitleFont 1
   SetCtlColors $0 "3257F7" "FFFFFF"
 
   nsDialogs::Show
 FunctionEnd
 
-Function MineradioDirectoryBrowse
-  nsDialogs::SelectFolderDialog "选择 Mineradio 安装文件夹" "$INSTDIR"
+Function ViberadioDirectoryBrowse
+  nsDialogs::SelectFolderDialog "选择 Viberadio 安装文件夹" "$INSTDIR"
   Pop $0
   ${If} $0 != error
   ${AndIf} $0 != ""
     Push "$0"
-    Call MineradioNormalizeInstallDir
+    Call ViberadioNormalizeInstallDir
     Pop $0
     StrCpy $INSTDIR "$0"
-    SendMessage $MineradioDirectoryInput ${WM_SETTEXT} 0 "STR:$INSTDIR"
+    SendMessage $ViberadioDirectoryInput ${WM_SETTEXT} 0 "STR:$INSTDIR"
   ${EndIf}
 FunctionEnd
 
-Function MineradioDirectoryShow
-  Call MineradioUsePreferredInstallDir
+Function ViberadioDirectoryShow
+  Call ViberadioUsePreferredInstallDir
 
   nsDialogs::Create 1018
-  Pop $MineradioDirectoryPage
-  ${If} $MineradioDirectoryPage == error
+  Pop $ViberadioDirectoryPage
+  ${If} $ViberadioDirectoryPage == error
     Abort
   ${EndIf}
 
-  SetCtlColors $MineradioDirectoryPage "111217" "FFFFFF"
-  CreateFont $MineradioTitleFont "Microsoft YaHei UI" 15 700
-  CreateFont $MineradioBodyFont "Microsoft YaHei UI" 9 400
-  CreateFont $MineradioSmallFont "Microsoft YaHei UI" 8 500
+  SetCtlColors $ViberadioDirectoryPage "111217" "FFFFFF"
+  CreateFont $ViberadioTitleFont "Microsoft YaHei UI" 15 700
+  CreateFont $ViberadioBodyFont "Microsoft YaHei UI" 9 400
+  CreateFont $ViberadioSmallFont "Microsoft YaHei UI" 8 500
 
   ${NSD_CreateLabel} 22u 12u 238u 20u "选择安装位置"
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioTitleFont 1
+  SendMessage $0 ${WM_SETFONT} $ViberadioTitleFont 1
   SetCtlColors $0 "111217" "FFFFFF"
 
   ${NSD_CreateLabel} 22u 40u 238u 24u "你可以使用默认路径，也可以选择其它磁盘或文件夹。安装器会自动创建缺失的目录。"
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioBodyFont 1
+  SendMessage $0 ${WM_SETFONT} $ViberadioBodyFont 1
   SetCtlColors $0 "4B5263" "FFFFFF"
 
   ${NSD_CreateLabel} 22u 76u 238u 10u "安装目录"
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioSmallFont 1
+  SendMessage $0 ${WM_SETFONT} $ViberadioSmallFont 1
   SetCtlColors $0 "3257F7" "FFFFFF"
 
   ${NSD_CreateText} 22u 94u 178u 15u "$INSTDIR"
-  Pop $MineradioDirectoryInput
-  SendMessage $MineradioDirectoryInput ${WM_SETFONT} $MineradioBodyFont 1
-  SetCtlColors $MineradioDirectoryInput "111217" "FFFFFF"
+  Pop $ViberadioDirectoryInput
+  SendMessage $ViberadioDirectoryInput ${WM_SETFONT} $ViberadioBodyFont 1
+  SetCtlColors $ViberadioDirectoryInput "111217" "FFFFFF"
 
   ${NSD_CreateBrowseButton} 210u 93u 50u 17u "浏览..."
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioSmallFont 1
-  ${NSD_OnClick} $0 MineradioDirectoryBrowse
+  SendMessage $0 ${WM_SETFONT} $ViberadioSmallFont 1
+  ${NSD_OnClick} $0 ViberadioDirectoryBrowse
 
-  ${NSD_CreateLabel} 22u 122u 238u 12u "默认推荐：D:\Mineradio；选盘符会自动建文件夹。"
+  ${NSD_CreateLabel} 22u 122u 238u 12u "默认推荐：D:\Viberadio；选盘符会自动建文件夹。"
   Pop $0
-  SendMessage $0 ${WM_SETFONT} $MineradioSmallFont 1
+  SendMessage $0 ${WM_SETFONT} $ViberadioSmallFont 1
   SetCtlColors $0 "6B7280" "FFFFFF"
 
   nsDialogs::Show
 FunctionEnd
 
-Function MineradioDirectoryLeave
-  ${NSD_GetText} $MineradioDirectoryInput $0
+Function ViberadioDirectoryLeave
+  ${NSD_GetText} $ViberadioDirectoryInput $0
   ${If} $0 == ""
     MessageBox MB_ICONEXCLAMATION|MB_OK "请选择安装文件夹。"
     Abort
   ${EndIf}
   Push "$0"
-  Call MineradioNormalizeInstallDir
+  Call ViberadioNormalizeInstallDir
   Pop $0
   StrCpy $INSTDIR "$0"
-  SendMessage $MineradioDirectoryInput ${WM_SETTEXT} 0 "STR:$INSTDIR"
-  Call MineradioValidateInstallDir
+  SendMessage $ViberadioDirectoryInput ${WM_SETTEXT} 0 "STR:$INSTDIR"
+  Call ViberadioValidateInstallDir
 FunctionEnd
 !endif
 
 !ifdef BUILD_UNINSTALLER
 !macro customUnInit
-  Call un.MineradioValidateUninstallDir
+  Call un.ViberadioValidateUninstallDir
 !macroend
 
-Function un.MineradioInstallDirLooksOwned
+Function un.ViberadioInstallDirLooksOwned
   Exch $0
   StrCpy $1 "0"
 
-  IfFileExists "$0\${MINERADIO_INSTALL_MARKER}" 0 +2
+  IfFileExists "$0\${VIBERADIO_INSTALL_MARKER}" 0 +2
     StrCpy $1 "1"
 
   StrCpy $0 "$1"
   Exch $0
 FunctionEnd
 
-Function un.MineradioNormalizeInstallDir
+Function un.ViberadioNormalizeInstallDir
   Exch $0
   Push "$0"
-  Call un.MineradioTrimInstallDir
+  Call un.ViberadioTrimInstallDir
   Pop $0
   StrLen $1 "$0"
   ${If} $1 == 2
     StrCpy $2 "$0" 1 1
     ${If} $2 == ":"
-      StrCpy $0 "$0\Mineradio"
+      StrCpy $0 "$0\Viberadio"
     ${EndIf}
   ${ElseIf} $1 == 3
     StrCpy $2 "$0" 1 1
     StrCpy $3 "$0" 1 2
     ${If} $2 == ":"
     ${AndIf} $3 == "\"
-      StrCpy $0 "$0Mineradio"
+      StrCpy $0 "$0Viberadio"
     ${EndIf}
   ${EndIf}
 
   StrLen $1 "$0"
   StrCpy $2 "$0" 10 -10
   ${If} $1 < 10
-  ${OrIf} $2 != "\Mineradio"
-  ${AndIf} $2 != "\mineradio"
-    StrCpy $0 "$0\Mineradio"
+  ${OrIf} $2 != "\Viberadio"
+  ${AndIf} $2 != "\viberadio"
+    StrCpy $0 "$0\Viberadio"
   ${EndIf}
   Exch $0
 FunctionEnd
 
-Function un.MineradioTrimInstallDir
+Function un.ViberadioTrimInstallDir
   Exch $0
 
   trim:
@@ -965,31 +965,31 @@ Function un.MineradioTrimInstallDir
   Exch $0
 FunctionEnd
 
-Function un.MineradioValidateUninstallDir
+Function un.ViberadioValidateUninstallDir
   Push "$INSTDIR"
-  Call un.MineradioTrimInstallDir
+  Call un.ViberadioTrimInstallDir
   Pop $0
   Push "$0"
-  Call un.MineradioNormalizeInstallDir
+  Call un.ViberadioNormalizeInstallDir
   Pop $1
   ${If} $0 != $1
-    MessageBox MB_OK|MB_ICONSTOP "当前卸载路径不是 Mineradio 专属目录，已阻止卸载以避免误删其它文件。$\r$\n$\r$\n当前路径：$INSTDIR$\r$\n安全路径应为：$0"
+    MessageBox MB_OK|MB_ICONSTOP "当前卸载路径不是 Viberadio 专属目录，已阻止卸载以避免误删其它文件。$\r$\n$\r$\n当前路径：$INSTDIR$\r$\n安全路径应为：$0"
     SetErrorLevel 2
     Quit
   ${EndIf}
   StrCpy $INSTDIR "$0"
 
   Push "$INSTDIR"
-  Call un.MineradioInstallDirLooksOwned
+  Call un.ViberadioInstallDirLooksOwned
   Pop $0
   ${If} $0 != "1"
-    MessageBox MB_OK|MB_ICONSTOP "无法确认当前目录属于 Mineradio，已阻止卸载以避免误删其它文件。$\r$\n$\r$\n当前路径：$INSTDIR"
+    MessageBox MB_OK|MB_ICONSTOP "无法确认当前目录属于 Viberadio，已阻止卸载以避免误删其它文件。$\r$\n$\r$\n当前路径：$INSTDIR"
     SetErrorLevel 2
     Quit
   ${EndIf}
 FunctionEnd
 
-Function un.MineradioRemoveInstalledFiles
+Function un.ViberadioRemoveInstalledFiles
   SetOutPath $TEMP
 
   Delete "$INSTDIR\${PRODUCT_FILENAME}.exe"

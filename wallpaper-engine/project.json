@@ -1,6 +1,6 @@
 {
-  "title": "XHeartMusic Visual Wallpaper",
-  "description": "3D audio-reactive particle visualizer. Requires XHeartMusic running locally (localhost:38080).",
+  "title": "Viberadio Visual Wallpaper",
+  "description": "3D audio-reactive particle visualizer. Requires Viberadio running locally (localhost:38080).",
   "type": "web",
   "file": "index.html",
   "general": {

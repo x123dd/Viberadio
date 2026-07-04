@@ -1,4 +1,4 @@
-// audio-bridge.js — SSE connection to XHeartMusic local server
+// audio-bridge.js — SSE connection to Viberadio local server
 var HOST = 'http://localhost:38080';
 var audioState = {
   playing: false, title: '', artist: '', cover: '',

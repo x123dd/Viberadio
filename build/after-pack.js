@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const { execFileSync } = require('child_process');
 
-if (process.env.XHEARTMUSIC_SILENT_LOGS === '1') {
+if (process.env.VIBERADIO_SILENT_LOGS === '1') {
   console.log = () => {};
   console.info = () => {};
   console.debug = () => {};
@@ -42,29 +42,29 @@ function resolveRcedit(projectDir) {
   }
   candidates.push(path.join(projectDir, 'node_modules', 'electron-winstaller', 'vendor', 'rcedit.exe'));
   var hit = candidates.find(function(candidate) { return candidate && fs.existsSync(candidate); });
-  if (!hit) throw new Error('No usable rcedit executable was found for XHeartMusic icon injection.');
+  if (!hit) throw new Error('No usable rcedit executable was found for Viberadio icon injection.');
   return hit;
 }
 
 module.exports = async function afterPack(context) {
   if (context.electronPlatformName !== 'win32') return;
 
-  const appName = context.packager.appInfo.productFilename || 'XHeartMusic';
+  const appName = context.packager.appInfo.productFilename || 'Viberadio';
   const exePath = path.join(context.appOutDir, `${appName}.exe`);
   const iconPath = path.join(context.packager.info.buildResourcesDir, 'icon.ico');
   const rceditPath = resolveRcedit(context.packager.projectDir);
 
-  if (!fs.existsSync(exePath)) throw new Error(`XHeartMusic executable was not found: ${exePath}`);
-  if (!fs.existsSync(iconPath)) throw new Error(`XHeartMusic icon was not found: ${iconPath}`);
+  if (!fs.existsSync(exePath)) throw new Error(`Viberadio executable was not found: ${exePath}`);
+  if (!fs.existsSync(iconPath)) throw new Error(`Viberadio icon was not found: ${iconPath}`);
 
   const version = context.packager.appInfo.version;
-  console.log(`  • injecting XHeartMusic resources  rcedit=${rceditPath}`);
+  console.log(`  • injecting Viberadio resources  rcedit=${rceditPath}`);
   execFileSync(rceditPath, [
     exePath,
     '--set-icon', iconPath,
-    '--set-version-string', 'FileDescription', 'XHeartMusic',
-    '--set-version-string', 'ProductName', 'XHeartMusic',
-    '--set-version-string', 'CompanyName', 'XHeartMusic',
+    '--set-version-string', 'FileDescription', 'Viberadio',
+    '--set-version-string', 'ProductName', 'Viberadio',
+    '--set-version-string', 'CompanyName', 'Viberadio',
     '--set-version-string', 'OriginalFilename', `${appName}.exe`,
     '--set-file-version', version,
     '--set-product-version', version

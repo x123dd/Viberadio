@@ -1,9 +1,9 @@
 {
-  "name": "xheartmusic",
-  "productName": "XHeartMusic",
+  "name": "viberadio",
+  "productName": "Viberadio",
   "version": "1.1.1",
-  "description": "X♥music - 沉浸式音乐播放器，融合天气电台、歌词舞台、粒子视觉和 3D 歌单架。",
-  "author": "XHeartMusic",
+  "description": "Viberadio - 沉浸式音乐播放器，融合天气电台、歌词舞台、粒子视觉和 3D 歌单架。",
+  "author": "Viberadio",
   "main": "desktop/main.js",
   "private": true,
   "scripts": {
@@ -12,8 +12,8 @@
     "build:win:dir": "electron-builder --win dir"
   },
   "build": {
-    "appId": "com.xheartmusic.desktop",
-    "productName": "XHeartMusic",
+    "appId": "com.viberadio.desktop",
+    "productName": "Viberadio",
     "directories": {
       "output": "dist",
       "buildResources": "build"
@@ -34,7 +34,7 @@
     ],
     "asar": false,
     "win": {
-      "executableName": "XHeartMusic",
+      "executableName": "Viberadio",
       "icon": "build/icon.ico",
       "signAndEditExecutable": false,
       "target": [
@@ -52,28 +52,28 @@
       "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "X♥music",
+      "shortcutName": "Viberadio",
       "installerIcon": "build/icon.ico",
       "uninstallerIcon": "build/icon.ico",
       "installerSidebar": "build/installerSidebar.bmp",
       "uninstallerSidebar": "build/installerSidebar.bmp",
       "installerHeader": "build/installerHeader.bmp",
       "include": "build/installer.nsh",
-      "artifactName": "XHeartMusic-${version}-Setup.${ext}"
+      "artifactName": "Viberadio-${version}-Setup.${ext}"
     },
     "publish": [
       {
         "provider": "github",
         "owner": "x123dd",
-        "repo": "XHeartMusic"
+        "repo": "Viberadio"
       }
     ]
   },
-  "xheartmusic": {
+  "viberadio": {
     "update": {
       "provider": "github",
       "owner": "x123dd",
-      "repo": "XHeartMusic",
+      "repo": "Viberadio",
       "preview": true,
       "preferMirrors": true,
       "mirrors": [

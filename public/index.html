@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>X♥music</title>
+<title>Viberadio</title>
 <meta name="referrer" content="no-referrer">
 <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;700;900&family=UnifrakturCook:wght@700&display=swap" rel="stylesheet">
 <script src="vendor/three.r128.min.js"></script>
@@ -11,7 +11,7 @@
 <script src="vendor/gsap.min.js"></script>
 <script>
 try {
-  document.documentElement.classList.add(localStorage.getItem('xheartmusic-diy-player-mode-v1') === '1' ? 'diy-mode-preload' : 'simple-mode-preload');
+  document.documentElement.classList.add(localStorage.getItem('viberadio-diy-player-mode-v1') === '1' ? 'diy-mode-preload' : 'simple-mode-preload');
 } catch (e) {
   document.documentElement.classList.add('simple-mode-preload');
 }
@@ -23,7 +23,7 @@ body.cursor-hidden,body.cursor-hidden *{cursor:none!important}
 html.desktop-shell-root,html.desktop-shell-root body{background:transparent}
 :root{--font-sans:"Noto Sans SC","PingFang SC","HarmonyOS Sans SC","Alibaba PuHuiTi","Inter",-apple-system,BlinkMacSystemFont,system-ui,sans-serif;--font-mono:"JetBrains Mono","Geist Mono","SF Mono",ui-monospace,monospace;--fc-bg:#08090B;--fc-paper:#0E1014;--fc-ink:#E8ECEF;--fc-ink-2:#D2D7DC;--fc-muted:#8A9099;--fc-hair:#1A1D22;--fc-hair-2:#262A31;--fc-accent:#00F5D4;--fc-accent-hov:#00E0BE;--fc-accent-rgb:0,245,212;--fc-blue:#2442ff;--fc-warm:#f8f4ee;--chill-ink:#030608;--chill-deep:#061116;--chill-cyan:#8fe9ff;--chill-blue:#73a7ff;--chill-mint:#9cffdf;--chill-soft:rgba(214,248,255,.9);--champagne:#f4d28a;--champagne-deep:#9a6f2c;--home-accent:#00f5d4;--home-accent-rgb:0,245,212;--visual-tint:#9db8cf;--source-netease:#d95b67;--source-qq:#00F5D4;--source-kugou:#5B8DEF;--source-qishui:#ff5082;--source-local:#9db8cf}
 :root{--glass-bg:linear-gradient(112deg,rgba(72,74,76,.62),rgba(24,27,30,.70) 48%,rgba(8,12,14,.74));--glass-bg-focus:linear-gradient(112deg,rgba(88,91,92,.68),rgba(28,32,35,.76) 50%,rgba(8,13,15,.82));--glass-border:rgba(0,245,212,.30);--glass-border-soft:rgba(255,255,255,.095);--glass-shadow:0 22px 64px rgba(0,0,0,.30),0 0 34px rgba(0,245,212,.052),inset 0 1px 0 rgba(255,255,255,.16),inset 0 -24px 58px rgba(0,0,0,.16);--glass-shadow-focus:0 24px 72px rgba(0,0,0,.34),0 0 0 1px rgba(0,245,212,.13),0 0 42px rgba(0,245,212,.075),inset 0 1px 0 rgba(255,255,255,.20)}
-:root{--saved-panel-glass-bg:rgba(0,0,0,.10);--saved-panel-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-panel-glass-svg-filter:url(#xheartmusic-control-glass-filter) saturate(1);--saved-panel-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.35),inset 0 0 10px 4px rgba(255,255,255,.15),0 4px 16px rgba(17,17,26,.05),0 8px 24px rgba(17,17,26,.05),0 16px 56px rgba(17,17,26,.05),inset 0 4px 16px rgba(17,17,26,.05),inset 0 8px 24px rgba(17,17,26,.05),inset 0 16px 56px rgba(17,17,26,.05);--saved-panel-glass-radius:50px;--saved-button-glass-bg:rgba(0,0,0,.10);--saved-button-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-button-glass-svg-filter:url(#xheartmusic-control-glass-filter) saturate(1);--saved-button-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.34),inset 0 0 10px 4px rgba(255,255,255,.13),0 10px 30px rgba(0,0,0,.18);--saved-button-glass-hover-bg:rgba(255,255,255,.055);--saved-button-glass-hover-shadow:inset 0 0 2px 1px rgba(255,255,255,.42),inset 0 0 12px 5px rgba(255,255,255,.17),0 12px 34px rgba(0,0,0,.22),0 0 18px rgba(255,255,255,.06)}
+:root{--saved-panel-glass-bg:rgba(0,0,0,.10);--saved-panel-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-panel-glass-svg-filter:url(#viberadio-control-glass-filter) saturate(1);--saved-panel-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.35),inset 0 0 10px 4px rgba(255,255,255,.15),0 4px 16px rgba(17,17,26,.05),0 8px 24px rgba(17,17,26,.05),0 16px 56px rgba(17,17,26,.05),inset 0 4px 16px rgba(17,17,26,.05),inset 0 8px 24px rgba(17,17,26,.05),inset 0 16px 56px rgba(17,17,26,.05);--saved-panel-glass-radius:50px;--saved-button-glass-bg:rgba(0,0,0,.10);--saved-button-glass-filter:blur(12px) saturate(1.8) brightness(1.16);--saved-button-glass-svg-filter:url(#viberadio-control-glass-filter) saturate(1);--saved-button-glass-shadow:inset 0 0 2px 1px rgba(255,255,255,.34),inset 0 0 10px 4px rgba(255,255,255,.13),0 10px 30px rgba(0,0,0,.18);--saved-button-glass-hover-bg:rgba(255,255,255,.055);--saved-button-glass-hover-shadow:inset 0 0 2px 1px rgba(255,255,255,.42),inset 0 0 12px 5px rgba(255,255,255,.17),0 12px 34px rgba(0,0,0,.22),0 0 18px rgba(255,255,255,.06)}
 :root{--home-icon-color:#f4d28a;--home-icon-rgb:244,210,138;--visual-icon-color:#7fd8ff;--visual-icon-rgb:127,216,255}
 .glass-saved-panel{background:var(--saved-panel-glass-bg);border:0;border-radius:var(--saved-panel-glass-radius);backdrop-filter:var(--saved-panel-glass-filter);-webkit-backdrop-filter:var(--saved-panel-glass-filter);box-shadow:var(--saved-panel-glass-shadow)}
 html.control-glass-svg-ok .glass-saved-panel{background:var(--saved-panel-glass-bg);backdrop-filter:var(--saved-panel-glass-svg-filter);-webkit-backdrop-filter:var(--saved-panel-glass-svg-filter)}
@@ -525,7 +525,7 @@ html.control-glass-svg-ok #bottom-bar{backdrop-filter:none;-webkit-backdrop-filt
 #bottom-bar::before{content:none}
 #bottom-bar::after{content:none}
 #bottom-bar.visible{opacity:.91;pointer-events:auto;transform:translateX(-50%) translateY(0) scale(1);filter:blur(0);background:rgba(0,0,0,.10);backdrop-filter:blur(12px) saturate(1.8) brightness(1.16);-webkit-backdrop-filter:blur(12px) saturate(1.8) brightness(1.16);box-shadow:inset 0 0 2px 1px rgba(255,255,255,.35),inset 0 0 10px 4px rgba(255,255,255,.15),0 4px 16px rgba(17,17,26,.05),0 8px 24px rgba(17,17,26,.05),0 16px 56px rgba(17,17,26,.05),inset 0 4px 16px rgba(17,17,26,.05),inset 0 8px 24px rgba(17,17,26,.05),inset 0 16px 56px rgba(17,17,26,.05)}
-html.control-glass-svg-ok #bottom-bar.visible{background:rgba(0,0,0,.10);backdrop-filter:url(#xheartmusic-control-glass-filter) saturate(1);-webkit-backdrop-filter:url(#xheartmusic-control-glass-filter) saturate(1)}
+html.control-glass-svg-ok #bottom-bar.visible{background:rgba(0,0,0,.10);backdrop-filter:url(#viberadio-control-glass-filter) saturate(1);-webkit-backdrop-filter:url(#viberadio-control-glass-filter) saturate(1)}
 #bottom-bar.soft-hidden{opacity:0;pointer-events:none;transform:translateX(-50%) translateY(88px) scale(.972);filter:none;background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none}
 body.home-controls-locked #bottom-bar{opacity:0!important;pointer-events:none!important;transform:translateX(-50%) translateY(92px) scale(.985)!important;filter:none!important;background:transparent!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;box-shadow:none!important}
 #bottom-bar.stage-mode{bottom:14px;width:calc(100vw - 56px)}
@@ -1511,8 +1511,8 @@ html.control-glass-svg-ok #playlist-panel{
   -webkit-backdrop-filter:var(--saved-panel-glass-filter)!important;
 }
 html.control-glass-svg-ok #search-box{
-  backdrop-filter:url(#xheartmusic-search-box-glass-filter) saturate(1)!important;
-  -webkit-backdrop-filter:url(#xheartmusic-search-box-glass-filter) saturate(1)!important;
+  backdrop-filter:url(#viberadio-search-box-glass-filter) saturate(1)!important;
+  -webkit-backdrop-filter:url(#viberadio-search-box-glass-filter) saturate(1)!important;
 }
 #home-btn,#upload-btn,#visual-guide-btn,#fx-fab,.top-account-pill,#top-right .icon-btn{
   background:var(--saved-button-glass-bg)!important;
@@ -1680,8 +1680,8 @@ html.control-glass-svg-ok .search-history-chip{
   border-color:transparent!important;
   color:rgba(var(--fc-accent-rgb),.78)!important;
   box-shadow:var(--saved-button-glass-shadow)!important;
-  backdrop-filter:url(#xheartmusic-search-pill-glass-filter) saturate(1)!important;
-  -webkit-backdrop-filter:url(#xheartmusic-search-pill-glass-filter) saturate(1)!important;
+  backdrop-filter:url(#viberadio-search-pill-glass-filter) saturate(1)!important;
+  -webkit-backdrop-filter:url(#viberadio-search-pill-glass-filter) saturate(1)!important;
   overflow:visible!important;
 }
 html.control-glass-svg-ok .search-mode-tabs button:hover,
@@ -1950,7 +1950,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 </div>
 
 <!-- 空场 Home -->
-<section id="empty-home" aria-label="X♥music home">
+<section id="empty-home" aria-label="Viberadio home">
   <div class="empty-home-shell">
     <div class="home-hero">
       <div class="home-hero-inner home-construction-inner">
@@ -2180,7 +2180,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
         <div class="fx-toggle" id="t-desktopLyricsClickThrough" onclick="toggleFx('desktopLyricsClickThrough')" title="锁定后防误触；鼠标移到桌面歌词上按中键可锁定/解锁"><span>桌面歌词锁定</span><span class="dot"></span></div>
         <div class="fx-toggle" id="t-desktopLyricsCinema" onclick="toggleFx('desktopLyricsCinema')" title="桌面歌词绑定鼓点电影震动，基础漂浮始终保留"><span>桌面歌词电影震动</span><span class="dot"></span></div>
         <div class="fx-toggle" id="t-desktopLyricsHighlight" onclick="toggleFx('desktopLyricsHighlight')" title="桌面歌词按播放进度高亮"><span>桌面歌词高亮跟随</span><span class="dot"></span></div>
-        <div class="fx-toggle" id="t-wallpaperMode" onclick="toggleFx('wallpaperMode')" title="将 X♥music 粒子视觉设为桌面壁纸"><span>壁纸模式</span><span class="dot"></span></div>
+        <div class="fx-toggle" id="t-wallpaperMode" onclick="toggleFx('wallpaperMode')" title="将 Viberadio 粒子视觉设为桌面壁纸"><span>壁纸模式</span><span class="dot"></span></div>
       </div>
       <div class="fx-section-label">桌面 / 壁纸</div>
       <div class="fx-slider"><label>桌面歌词大小</label><input id="fx-desktoplyricssize" type="range" min="0.72" max="1.55" step="0.01"><output></output></div>
@@ -2361,7 +2361,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 <!-- 底部控件 -->
 <svg id="control-glass-svg" class="control-glass-filter-svg" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
   <defs>
-    <filter id="xheartmusic-control-glass-filter" color-interpolation-filters="sRGB" x="-12%" y="-28%" width="124%" height="156%">
+    <filter id="viberadio-control-glass-filter" color-interpolation-filters="sRGB" x="-12%" y="-28%" width="124%" height="156%">
       <feImage id="control-glass-map" x="0" y="0" width="100%" height="100%" preserveAspectRatio="none" result="map"></feImage>
       <feDisplacementMap in="SourceGraphic" in2="map" scale="180" xChannelSelector="R" yChannelSelector="B" result="dispRed"></feDisplacementMap>
       <feOffset in="dispRed" dx="-90" dy="0" result="dispRedShifted"></feOffset>
@@ -2379,7 +2379,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
       <feBlend in="rg" in2="blue" mode="screen" result="output"></feBlend>
       <feGaussianBlur in="output" stdDeviation="0.5"></feGaussianBlur>
     </filter>
-    <filter id="xheartmusic-search-box-glass-filter" color-interpolation-filters="sRGB" x="-24%" y="-34%" width="158%" height="168%">
+    <filter id="viberadio-search-box-glass-filter" color-interpolation-filters="sRGB" x="-24%" y="-34%" width="158%" height="168%">
       <feImage id="search-box-glass-map" x="-10%" y="-4%" width="120%" height="108%" preserveAspectRatio="none" result="map"></feImage>
       <feDisplacementMap in="SourceGraphic" in2="map" scale="180" xChannelSelector="R" yChannelSelector="B" result="dispRed"></feDisplacementMap>
       <feOffset in="dispRed" dx="-90" dy="0" result="dispRedShifted"></feOffset>
@@ -2397,7 +2397,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
       <feBlend in="rg" in2="blue" mode="screen" result="output"></feBlend>
       <feGaussianBlur in="output" stdDeviation="0.5"></feGaussianBlur>
     </filter>
-    <filter id="xheartmusic-search-pill-glass-filter" color-interpolation-filters="sRGB" x="-48%" y="-68%" width="210%" height="236%">
+    <filter id="viberadio-search-pill-glass-filter" color-interpolation-filters="sRGB" x="-48%" y="-68%" width="210%" height="236%">
       <feImage id="search-pill-glass-map" x="-24%" y="-14%" width="148%" height="128%" preserveAspectRatio="none" result="map"></feImage>
       <feDisplacementMap in="SourceGraphic" in2="map" scale="118" xChannelSelector="R" yChannelSelector="B" result="dispRed"></feDisplacementMap>
       <feOffset in="dispRed" dx="-34" dy="0" result="dispRedShifted"></feOffset>
@@ -2658,7 +2658,7 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
     <div class="update-panel-inner">
       <div class="update-panel-head">
         <div>
-          <div class="update-kicker">XHEARTMUSIC</div>
+          <div class="update-kicker">VIBERADIO</div>
           <div id="update-modal-title" class="update-title">New release</div>
           <div id="update-modal-version" class="update-version">v1.0.10</div>
         </div>
@@ -2763,23 +2763,23 @@ var AUDIO_FADE_IN_MS = 460;
 var AUDIO_FADE_OUT_MS = 420;
 var AUDIO_SILENCE_GAIN = 0.0001;
 var userPlaylists = [], qqPlaylists = [], myPodcastCollections = [], myPodcastItems = {}, playlistCoverCache = {};
-var CUSTOM_COVER_STORE_KEY = 'xheartmusic-custom-covers';
-var CUSTOM_LYRIC_STORE_KEY = 'xheartmusic-custom-lyrics-v1';
-var CUSTOM_LYRIC_PREF_STORE_KEY = 'xheartmusic-custom-lyric-prefs-v1';
-var LYRIC_LAYOUT_STORE_KEY = 'xheartmusic-lyric-layout-v1';
+var CUSTOM_COVER_STORE_KEY = 'viberadio-custom-covers';
+var CUSTOM_LYRIC_STORE_KEY = 'viberadio-custom-lyrics-v1';
+var CUSTOM_LYRIC_PREF_STORE_KEY = 'viberadio-custom-lyric-prefs-v1';
+var LYRIC_LAYOUT_STORE_KEY = 'viberadio-lyric-layout-v1';
 var VISUAL_PRESET_SCHEMA = 'skull-preset-v2';
-var PLAYBACK_QUALITY_STORE_KEY = 'xheartmusic-playback-quality-v1';
-var UPLOAD_TIP_STORE_KEY = 'xheartmusic-upload-tip-seen';
-var DIY_MODE_STORE_KEY = 'xheartmusic-diy-player-mode-v1';
-var PLAYLIST_PANEL_PIN_STORE_KEY = 'xheartmusic-playlist-panel-pinned-v1';
-var USER_CAPSULE_AUTO_HIDE_STORE_KEY = 'xheartmusic-user-capsule-auto-hide-v1';
-var FX_FAB_AUTO_HIDE_STORE_KEY = 'xheartmusic-fx-fab-auto-hide-v1';
-var CONTROLS_AUTO_HIDE_STORE_KEY = 'xheartmusic-controls-auto-hide-v1';
-var FREE_CAMERA_STORE_KEY = 'xheartmusic-free-camera-v1';
-var HOTKEY_SETTINGS_STORE_KEY = 'xheartmusic-hotkey-settings-v1';
-var VISUAL_GUIDE_SEEN_STORE_KEY = 'xheartmusic-visual-guide-seen-v2';
-var LOCAL_BEATMAP_STORE_KEY = 'xheartmusic-local-beatmaps-v1';
-var LOCAL_BEAT_PREF_STORE_KEY = 'xheartmusic-local-beatmap-prefs-v1';
+var PLAYBACK_QUALITY_STORE_KEY = 'viberadio-playback-quality-v1';
+var UPLOAD_TIP_STORE_KEY = 'viberadio-upload-tip-seen';
+var DIY_MODE_STORE_KEY = 'viberadio-diy-player-mode-v1';
+var PLAYLIST_PANEL_PIN_STORE_KEY = 'viberadio-playlist-panel-pinned-v1';
+var USER_CAPSULE_AUTO_HIDE_STORE_KEY = 'viberadio-user-capsule-auto-hide-v1';
+var FX_FAB_AUTO_HIDE_STORE_KEY = 'viberadio-fx-fab-auto-hide-v1';
+var CONTROLS_AUTO_HIDE_STORE_KEY = 'viberadio-controls-auto-hide-v1';
+var FREE_CAMERA_STORE_KEY = 'viberadio-free-camera-v1';
+var HOTKEY_SETTINGS_STORE_KEY = 'viberadio-hotkey-settings-v1';
+var VISUAL_GUIDE_SEEN_STORE_KEY = 'viberadio-visual-guide-seen-v2';
+var LOCAL_BEATMAP_STORE_KEY = 'viberadio-local-beatmaps-v1';
+var LOCAL_BEAT_PREF_STORE_KEY = 'viberadio-local-beatmap-prefs-v1';
 var LOCAL_BEAT_COMBOS = ['', 'downbeat', 'push', 'drop', 'rebound', 'accent'];
 var HOTKEY_ACTIONS = [
   { key:'togglePlay', label:'播放 / 暂停', category:'播放', local:'Space', global:'Ctrl+Alt+Space' },
@@ -2817,8 +2817,8 @@ var homeDiscoverState = { loading: false, loaded: false, loggedIn: false, mode: 
 var homeDiscoverToken = 0;
 var homeVisualPresetActive = false;
 var homeVisualPrevPreset = 0;
-var HOME_LISTEN_STATS_KEY = 'xheartmusic-listen-stats-v1';
-var HOME_WEATHER_CITY_KEY = 'xheartmusic-weather-city';
+var HOME_LISTEN_STATS_KEY = 'viberadio-listen-stats-v1';
+var HOME_WEATHER_CITY_KEY = 'viberadio-weather-city';
 var homeWeatherRadioState = { loading: false, loaded: false, city: localStorage.getItem(HOME_WEATHER_CITY_KEY) || '上海', weather: null, radio: null, error: '', updatedAt: 0 };
 var homeWeatherToken = 0;
 var homeWeatherLoadTimer = null;
@@ -2832,8 +2832,8 @@ function markAppPerf(name) {
   try {
     var value = performance.now();
     appPerfMarks.push({ name: name, value: Math.round(value) });
-    if (performance && performance.mark) performance.mark('xheartmusic:' + name);
-    if (appPerfMarks.length <= 16) console.debug('[XHeartMusicPerf]', name, Math.round(value) + 'ms');
+    if (performance && performance.mark) performance.mark('viberadio:' + name);
+    if (appPerfMarks.length <= 16) console.debug('[ViberadioPerf]', name, Math.round(value) + 'ms');
   } catch (e) {}
 }
 markAppPerf('script-start');
@@ -2843,7 +2843,7 @@ function installStartupLongTaskObserver() {
     var observer = new PerformanceObserver(function(list){
       list.getEntries().forEach(function(entry){
         if (entry.startTime > 15000) return;
-        console.debug('[XHeartMusicPerf] longtask', Math.round(entry.startTime) + 'ms', Math.round(entry.duration) + 'ms');
+        console.debug('[ViberadioPerf] longtask', Math.round(entry.startTime) + 'ms', Math.round(entry.duration) + 'ms');
       });
     });
     observer.observe({ entryTypes: ['longtask'] });
@@ -3665,7 +3665,7 @@ function collectRuntimePerfSnapshot(now) {
     deepSleep: isDeepBackgroundMode()
   };
 }
-window.__xheartmusicPerfSnapshot = collectRuntimePerfSnapshot;
+window.__viberadioPerfSnapshot = collectRuntimePerfSnapshot;
 function trimRuntimeCaches(reason, aggressive) {
   var protectedCovers = collectProtectedCoverUrls();
   var protectedBeats = collectProtectedBeatMapKeys();
@@ -8040,7 +8040,7 @@ function customBackgroundMediaLabel(media) {
   if (!media) return '未设置';
   return media.type === 'video' ? '视频已设置' : '图片已设置';
 }
-var CUSTOM_BG_DB_NAME = 'xheartmusic-custom-background-v1';
+var CUSTOM_BG_DB_NAME = 'viberadio-custom-background-v1';
 var CUSTOM_BG_STORE = 'media';
 var customBgObjectUrl = '';
 var customBgApplyToken = 0;
@@ -9852,7 +9852,7 @@ function forceLoadingSettled(reason) {
   }
   uniforms.uLoading.value = 0;
   loadingShownAt = 0;
-  if (reason && window.__xheartmusicDebugLoading) console.log('[LoadingSettled]', reason);
+  if (reason && window.__viberadioDebugLoading) console.log('[LoadingSettled]', reason);
 }
 function recoverVisualsAfterBackground(reason) {
   applyRendererPowerMode();
@@ -12285,7 +12285,7 @@ function updateLocalBeatModal() {
   var desc = document.getElementById('local-beat-desc');
   if (desc) desc.textContent = mode === 'dj'
     ? '适合 DJ、长混音或鼓点密集的本地音频，会使用更稳定的低频锁拍并进入 DJ 视觉驱动。'
-    : '适合普通歌曲和日常播放，会沿用 X♥music 电影视角的综合节奏分析。';
+    : '适合普通歌曲和日常播放，会沿用 Viberadio 电影视角的综合节奏分析。';
   var start = document.getElementById('local-beat-start-btn');
   var cancel = document.getElementById('local-beat-cancel-btn');
   var later = document.getElementById('local-beat-later-btn');
@@ -15614,7 +15614,7 @@ function renderHomeDiscover() {
   var weatherKicker = document.getElementById('home-weather-kicker');
   var weatherMeta = document.getElementById('home-weather-meta');
   if (weatherTitle) weatherTitle.textContent = '我的音乐库';
-  if (weatherKicker) weatherKicker.textContent = 'X♥music · Your Library';
+  if (weatherKicker) weatherKicker.textContent = 'Viberadio · Your Library';
   if (sub) {
     if (loggedOutHome) sub.textContent = '登录后会把你的歌单、常听歌手和最近播放放在这里；也可以直接搜索或导入本地音乐。';
     else sub.textContent = '从你的歌单、最近播放和常听歌手开始，天气电台放在需要氛围的时候再开。';
@@ -17242,7 +17242,7 @@ function avatarSrc(url) {
 var searchTimer = null;
 var searchRequestSeq = 0;
 var searchLastResultQuery = '';
-var SEARCH_HISTORY_STORE_KEY = 'xheartmusic-search-history';
+var SEARCH_HISTORY_STORE_KEY = 'viberadio-search-history';
 var $input = document.getElementById('search-input');
 var $results = document.getElementById('search-results');
 var $loading = document.getElementById('loading-overlay');
@@ -19043,7 +19043,7 @@ function normalizeControlGlassChromaticOffset(value) {
 function applyControlGlassChromaticOffset() {
   if (!fx) return;
   fx.controlGlassChromaticOffset = normalizeControlGlassChromaticOffset(fx.controlGlassChromaticOffset);
-  var filter = document.getElementById('xheartmusic-control-glass-filter');
+  var filter = document.getElementById('viberadio-control-glass-filter');
   if (!filter) return;
   var dx = String(-Math.round(fx.controlGlassChromaticOffset));
   filter.querySelectorAll('feOffset').forEach(function(node){
@@ -19056,7 +19056,7 @@ function supportsControlGlassSvgFilter() {
     var ua = navigator.userAgent || '';
     if ((/Safari/.test(ua) && !/Chrome/.test(ua)) || /Firefox/.test(ua)) return false;
     var div = document.createElement('div');
-    div.style.backdropFilter = 'url(#xheartmusic-control-glass-filter)';
+    div.style.backdropFilter = 'url(#viberadio-control-glass-filter)';
     return div.style.backdropFilter !== '';
   } catch (e) {
     return false;
@@ -20165,8 +20165,8 @@ function updatePlaybackProgressUi() {
   if (timeDisplay) timeDisplay.textContent = formatProgramTime(currentSec) + ' / ' + (durationSec > 0 ? formatProgramTime(durationSec) : '0:00');
 }
 function bindPlaybackProgressEvents(audioEl) {
-  if (!audioEl || audioEl._xheartmusicProgressBound) return;
-  audioEl._xheartmusicProgressBound = true;
+  if (!audioEl || audioEl._viberadioProgressBound) return;
+  audioEl._viberadioProgressBound = true;
   ['loadedmetadata', 'durationchange', 'timeupdate', 'seeked', 'play', 'pause', 'emptied'].forEach(function(name){
     audioEl.addEventListener(name, updatePlaybackProgressUi);
   });
@@ -20368,8 +20368,8 @@ var lyricColorPresets = [
   { name:'酒红', color:'#6d1f35' },
   { name:'墨黑', color:'#111318' },
 ];
-var USER_FX_ARCHIVE_STORE_KEY = 'xheartmusic-user-fx-archives-v1';
-var USER_FX_ARCHIVE_EXPORT_TYPE = 'xheartmusic-user-fx-archive';
+var USER_FX_ARCHIVE_STORE_KEY = 'viberadio-user-fx-archives-v1';
+var USER_FX_ARCHIVE_EXPORT_TYPE = 'viberadio-user-fx-archive';
 var USER_FX_ARCHIVE_SCHEMA = 1;
 function defaultUserFxArchiveName(index) {
   return '存档 ' + (index + 1);
@@ -20787,7 +20787,7 @@ function userFxArchiveExportPayload(slot) {
   };
 }
 function safeArchiveFileName(name) {
-  return String(name || 'X♥music 用户存档').replace(/[\\/:*?"<>|]+/g, '-').slice(0, 48) + '.json';
+  return String(name || 'Viberadio 用户存档').replace(/[\\/:*?"<>|]+/g, '-').slice(0, 48) + '.json';
 }
 function exportUserFxArchive(index) {
   var slot = userFxArchiveAt(index);
@@ -21612,7 +21612,7 @@ function updateDevelopmentFxControls() {
     ['desktopLyricsClickThrough', 't-desktopLyricsClickThrough', '锁定后防误触；鼠标移到桌面歌词上按中键可锁定/解锁'],
     ['desktopLyricsCinema', 't-desktopLyricsCinema', '桌面歌词绑定鼓点电影震动，基础漂浮始终保留'],
     ['desktopLyricsHighlight', 't-desktopLyricsHighlight', '桌面歌词按播放进度高亮'],
-    ['wallpaperMode', 't-wallpaperMode', '将 X♥music 粒子视觉设为桌面壁纸']
+    ['wallpaperMode', 't-wallpaperMode', '将 Viberadio 粒子视觉设为桌面壁纸']
   ].forEach(function(item){
     var locked = isDevelopmentLockedFx(item[0]);
     var el = document.getElementById(item[1]);
@@ -22206,7 +22206,7 @@ function ensureHotkeyModal() {
   modal.innerHTML =
     '<div class="hotkey-dialog" role="dialog" aria-modal="true" aria-label="热键设置">' +
       '<div class="hotkey-head">' +
-        '<div><div class="hotkey-title">热键设置</div><div class="hotkey-sub">局内热键只在 X♥music 窗口内生效；全局热键会向系统注册，并检测是否被占用。</div></div>' +
+        '<div><div class="hotkey-title">热键设置</div><div class="hotkey-sub">局内热键只在 Viberadio 窗口内生效；全局热键会向系统注册，并检测是否被占用。</div></div>' +
         '<button class="hotkey-close" type="button" data-hotkey-close aria-label="关闭">×</button>' +
       '</div>' +
       '<div class="hotkey-toolbar">' +
@@ -22231,7 +22231,7 @@ function ensureHotkeyModal() {
 }
 function hotkeyStatusMarkup(scope, actionKey, binding, duplicate) {
   if (!binding) return '<span class="hotkey-status">未设置</span>';
-  if (duplicate && duplicate[binding] > 1) return '<span class="hotkey-status conflict"><span class="source-icon">!</span>X♥music 内部重复</span>';
+  if (duplicate && duplicate[binding] > 1) return '<span class="hotkey-status conflict"><span class="source-icon">!</span>Viberadio 内部重复</span>';
   if (scope === 'local') return '<span class="hotkey-status ok">可用</span>';
   var status = hotkeyGlobalStatus[actionKey];
   if (!status) return '<span class="hotkey-status">待检测</span>';
@@ -23052,7 +23052,7 @@ function syncUpdatePreviewStateClass() {
   if (foot) {
     if (isDownloading) foot.textContent = (updatePreviewState.message || (isPatch ? '正在下载快速补丁' : '正在下载完整安装包')) + (updateProgressDetailText() ? ' · ' + updateProgressDetailText() : '');
     else if (isError) foot.textContent = '下载失败：' + (updatePreviewState.errorReason || updatePreviewState.errorDetail || updatePreviewState.message || '请稍后重试') + (updatePreviewState.failedAttempts && updatePreviewState.failedAttempts.length ? ' · 已尝试 ' + updatePreviewState.failedAttempts.length + ' 条线路' : '');
-    else if (isReady && isPatch) foot.textContent = updatePreviewState.restartRequired ? '快速补丁已应用，重启 X♥music 后生效。' : '快速补丁已应用。';
+    else if (isReady && isPatch) foot.textContent = updatePreviewState.restartRequired ? '快速补丁已应用，重启 Viberadio 后生效。' : '快速补丁已应用。';
     else if (isReady) foot.textContent = updatePreviewState.cached ? '已复用上次校验通过的安装包，不会重复下载。' : '安装包已准备好，点击按钮后再打开安装。';
     else if (updatePreviewState.patchAvailable) foot.textContent = '优先使用轻量补丁，只更新缺失或变更的资源文件；不适用时可下载完整安装包。';
     else foot.textContent = updatePreviewState.updateAvailable ? '没有可用快速补丁时会下载完整安装包。' : '当前版本已是最新。';
@@ -23310,7 +23310,7 @@ async function restartForAppliedPatch() {
       return;
     }
   } catch (e) {}
-  showToast('请手动重启 X♥music 让补丁生效');
+  showToast('请手动重启 Viberadio 让补丁生效');
 }
 
 async function openDownloadedUpdateInstaller(filePath) {
@@ -25032,7 +25032,7 @@ var visualGuideSteps = [
   {
     target: 'stage',
     kicker: '01 / Welcome',
-    title: 'X♥music 是用来听歌的视觉播放器',
+    title: 'Viberadio 是用来听歌的视觉播放器',
     body: '它不是单纯歌单页：搜索或导入一首歌后，封面、歌词、粒子和镜头会跟着音乐一起动。'
   },
   {
@@ -26132,7 +26132,7 @@ function splashEaseOutCubic(t) {
   return 1 - Math.pow(1 - t, 3);
 }
 
-function initXHeartMusicSplashWebgl(canvas) {
+function initViberadioSplashWebgl(canvas) {
   var gl = null;
   try {
     gl = canvas.getContext('webgl', {
@@ -26304,7 +26304,7 @@ function initXHeartMusicSplashWebgl(canvas) {
   return true;
 }
 
-function drawXHeartMusicSplashWebgl(elapsed) {
+function drawViberadioSplashWebgl(elapsed) {
   var gl = splashGl;
   if (!gl || !splashGlProgram || !splashGlUniforms) return;
   gl.viewport(0, 0, splashCanvas.width, splashCanvas.height);
@@ -26317,10 +26317,10 @@ function drawXHeartMusicSplashWebgl(elapsed) {
   gl.drawArrays(gl.TRIANGLES, 0, 3);
 }
 
-(function initXHeartMusicSplashCanvas() {
+(function initViberadioSplashCanvas() {
   splashCanvas = document.getElementById('splash-canvas');
   if (!splashCanvas) return;
-  if (!reduceSplashMotion && initXHeartMusicSplashWebgl(splashCanvas)) {
+  if (!reduceSplashMotion && initViberadioSplashWebgl(splashCanvas)) {
     splashCtx = null;
   } else {
     splashCtx = splashCanvas.getContext('2d');
@@ -26385,15 +26385,15 @@ function drawXHeartMusicSplashWebgl(elapsed) {
   }
   resize();
   window.addEventListener('resize', resize);
-  drawXHeartMusicSplash();
+  drawViberadioSplash();
 })();
 
-function drawXHeartMusicSplash() {
+function drawViberadioSplash() {
   if (!splashAnimating || (!splashCtx && !splashGl)) return;
-  requestAnimationFrame(drawXHeartMusicSplash);
+  requestAnimationFrame(drawViberadioSplash);
   var elapsed = (performance.now() - splashStartedAt) / 1000;
   if (splashGl && splashGlProgram) {
-    drawXHeartMusicSplashWebgl(elapsed);
+    drawViberadioSplashWebgl(elapsed);
     return;
   }
   splashCtx.clearRect(0, 0, splashW, splashH);
@@ -26549,7 +26549,7 @@ function drawXHeartMusicSplash() {
   splashCtx.restore();
 }
 
-function playXHeartMusicIntroSound() {
+function playViberadioIntroSound() {
   if (splashSoundPlayed) return;
   try {
     var AudioContextCtor = window.AudioContext || window.webkitAudioContext;
@@ -26558,7 +26558,7 @@ function playXHeartMusicIntroSound() {
     splashAudioCtx = ctx;
     if (ctx.state === 'suspended' && ctx.resume) {
       ctx.resume().then(function(){
-        if (!splashSoundPlayed) playXHeartMusicIntroSound();
+        if (!splashSoundPlayed) playViberadioIntroSound();
       }).catch(function(){});
       if (ctx.state === 'suspended') return;
     }
@@ -26631,7 +26631,7 @@ function armSplashSoundFallback() {
   if (splashSoundFallbackArmed) return;
   splashSoundFallbackArmed = true;
   function unlock() {
-    if (!splashSoundPlayed) playXHeartMusicIntroSound();
+    if (!splashSoundPlayed) playViberadioIntroSound();
     document.removeEventListener('pointerdown', unlock, true);
     document.removeEventListener('keydown', unlock, true);
   }
@@ -26695,7 +26695,7 @@ function markSplashReadyToEnter() {
   s.classList.add('ready');
   s.setAttribute('role', 'button');
   s.setAttribute('tabindex', '0');
-  s.setAttribute('aria-label', '点击进入 X♥music');
+  s.setAttribute('aria-label', '点击进入 Viberadio');
 }
 
 document.addEventListener('DOMContentLoaded', function(){
@@ -26705,7 +26705,7 @@ document.addEventListener('DOMContentLoaded', function(){
   armSplashSoundFallback();
   prewarmHomeWallpaperPreview();
   function requestSplashEnter() {
-    playXHeartMusicIntroSound();
+    playViberadioIntroSound();
     if (splashReadyToEnter) dismissSplash();
   }
   s.addEventListener('click', requestSplashEnter);
@@ -26721,7 +26721,7 @@ document.addEventListener('DOMContentLoaded', function(){
     splashTimer = setTimeout(markSplashReadyToEnter, 900);
     return;
   }
-  playXHeartMusicIntroSound();
+  playViberadioIntroSound();
   splashTimer = setTimeout(markSplashReadyToEnter, 5000);
 });
 
@@ -26739,7 +26739,7 @@ function currentDesktopSongMeta() {
   var song = playQueue && currentIdx >= 0 ? playQueue[currentIdx] : null;
   song = song || currentLyricSong && currentLyricSong() || {};
   return {
-    title: song.name || song.title || 'X♥music',
+    title: song.name || song.title || 'Viberadio',
     artist: song.artist || song.ar || song.author || '',
     cover: (typeof songCoverSrc === 'function' && song) ? (songCoverSrc(song, 360) || song.cover || '') : (song.cover || '')
   };
@@ -26785,7 +26785,7 @@ function currentDesktopLyricSnapshot() {
       progressSpan: 4.8
     };
   }
-  return { text: normalizeDesktopLyricText(currentDesktopSongMeta().title || 'X♥music'), progress: 0, progressSpan: 4.8 };
+  return { text: normalizeDesktopLyricText(currentDesktopSongMeta().title || 'Viberadio'), progress: 0, progressSpan: 4.8 };
 }
 function desktopOverlayColorValue(value, fallback) {
   var raw = String(value || '').trim();
@@ -27190,7 +27190,7 @@ var renderPerfState = {
   lastRenderAt: 0,
   lastSampleAt: performance.now()
 };
-window.__xheartmusicPerf = renderPerfState;
+window.__viberadioPerf = renderPerfState;
 var splashWarmRenderLast = 0;
 function isMainSceneCoveredBySplash() {
   return document.body.classList.contains('splash-active') && !document.body.classList.contains('splash-revealing');

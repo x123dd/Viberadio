@@ -16,33 +16,33 @@ contextBridge.exposeInMainWorld('desktopWindow', {
   clearKGMusicLogin: () => ipcRenderer.invoke('kg-music-clear-login'),
   openQishuiMusicLogin: () => ipcRenderer.invoke('qishui-music-open-login'),
   clearQishuiMusicLogin: () => ipcRenderer.invoke('qishui-music-clear-login'),
-  openUpdateInstaller: (filePath) => ipcRenderer.invoke('mineradio-open-update-installer', filePath),
-  restartApp: () => ipcRenderer.invoke('mineradio-restart-app'),
-  configureGlobalHotkeys: (bindings) => ipcRenderer.invoke('mineradio-hotkeys-configure-global', bindings || []),
-  exportJsonFile: (payload) => ipcRenderer.invoke('mineradio-export-json-file', payload || {}),
-  importJsonFile: () => ipcRenderer.invoke('mineradio-import-json-file'),
+  openUpdateInstaller: (filePath) => ipcRenderer.invoke('viberadio-open-update-installer', filePath),
+  restartApp: () => ipcRenderer.invoke('viberadio-restart-app'),
+  configureGlobalHotkeys: (bindings) => ipcRenderer.invoke('viberadio-hotkeys-configure-global', bindings || []),
+  exportJsonFile: (payload) => ipcRenderer.invoke('viberadio-export-json-file', payload || {}),
+  importJsonFile: () => ipcRenderer.invoke('viberadio-import-json-file'),
   onGlobalHotkey: (callback) => {
     if (typeof callback !== 'function') return () => {};
     const listener = (_event, payload) => callback(payload || {});
-    ipcRenderer.on('mineradio-global-hotkey', listener);
-    return () => ipcRenderer.removeListener('mineradio-global-hotkey', listener);
+    ipcRenderer.on('viberadio-global-hotkey', listener);
+    return () => ipcRenderer.removeListener('viberadio-global-hotkey', listener);
   },
-  setDesktopLyricsEnabled: (enabled, payload) => ipcRenderer.invoke('mineradio-desktop-lyrics-set-enabled', !!enabled, payload || {}),
-  updateDesktopLyrics: (payload) => ipcRenderer.invoke('mineradio-desktop-lyrics-update', payload || {}),
+  setDesktopLyricsEnabled: (enabled, payload) => ipcRenderer.invoke('viberadio-desktop-lyrics-set-enabled', !!enabled, payload || {}),
+  updateDesktopLyrics: (payload) => ipcRenderer.invoke('viberadio-desktop-lyrics-update', payload || {}),
   onDesktopLyricsLockState: (callback) => {
     if (typeof callback !== 'function') return () => {};
     const listener = (_event, payload) => callback(payload || {});
-    ipcRenderer.on('mineradio-desktop-lyrics-lock-state', listener);
-    return () => ipcRenderer.removeListener('mineradio-desktop-lyrics-lock-state', listener);
+    ipcRenderer.on('viberadio-desktop-lyrics-lock-state', listener);
+    return () => ipcRenderer.removeListener('viberadio-desktop-lyrics-lock-state', listener);
   },
   onDesktopLyricsEnabledState: (callback) => {
     if (typeof callback !== 'function') return () => {};
     const listener = (_event, payload) => callback(payload || {});
-    ipcRenderer.on('mineradio-desktop-lyrics-enabled-state', listener);
-    return () => ipcRenderer.removeListener('mineradio-desktop-lyrics-enabled-state', listener);
+    ipcRenderer.on('viberadio-desktop-lyrics-enabled-state', listener);
+    return () => ipcRenderer.removeListener('viberadio-desktop-lyrics-enabled-state', listener);
   },
-  setWallpaperMode: (enabled, payload) => ipcRenderer.invoke('mineradio-wallpaper-set-enabled', !!enabled, payload || {}),
-  updateWallpaperMode: (payload) => ipcRenderer.invoke('mineradio-wallpaper-update', payload || {}),
+  setWallpaperMode: (enabled, payload) => ipcRenderer.invoke('viberadio-wallpaper-set-enabled', !!enabled, payload || {}),
+  updateWallpaperMode: (payload) => ipcRenderer.invoke('viberadio-wallpaper-update', payload || {}),
   onStateChange: (callback) => {
     const listener = (_event, state) => callback(state);
     ipcRenderer.on('desktop-window-state', listener);
