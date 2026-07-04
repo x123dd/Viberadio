@@ -3413,6 +3413,175 @@ async function runPlatformUrl(provider, song, qualityPreference) {
   return { url: url, trial: trial, level: level, quality: quality, br: br };
 }
 
+// ====================================================================
+//  Multi-Source Fallback — 主函数
+// ====================================================================
+function makeCacheKey(name, artist) {
+  return crypto.createHash('md5').update(
+    normalizeMatchText(name) + '|' + normalizeMatchText(artist)
+  ).digest('hex');
+}
+
+async function resolveSongUrl(body) {
+  var name = String(body.name || '').trim();
+  var artist = String(body.artist || '').trim();
+  if (!name) return { ok: false, reason: 'missing_name' };
+
+  var cacheKey = makeCacheKey(name, artist);
+
+  // URL cache hit → immediate return (~0ms)
+  var urlCached = fallbackUrlCache.get(cacheKey);
+  if (urlCached && urlCached.expiresAt > Date.now()) {
+    return {
+      ok: true, resolvedBy: urlCached.resolvedBy, url: urlCached.url,
+      song: urlCached.song, quality: { level: urlCached.level, label: urlCached.quality, br: urlCached.br },
+      trial: !!urlCached.trial, fromCache: 'url'
+    };
+  }
+
+  // Concurrent dedup
+  var pending = pendingResolves.get(cacheKey);
+  if (pending) return pending;
+
+  var resolvePromise = doResolveSongUrl(name, artist, body, cacheKey);
+  pendingResolves.set(cacheKey, resolvePromise);
+  try { return await resolvePromise; }
+  finally { pendingResolves.delete(cacheKey); }
+}
+
+async function doResolveSongUrl(name, artist, body, cacheKey) {
+  // Mapping cache hit → skip search, fetch URL directly
+  var mappingCached = fallbackMappingCache.get(cacheKey);
+  if (mappingCached && mappingCached.expiresAt > Date.now()) {
+    var mp = mappingCached;
+    try {
+      var urlData = await runPlatformUrl(mp.resolvedBy, mp.song, body.quality);
+      if (urlData && urlData.url) {
+        recordCircuitSuccess(mp.resolvedBy);
+        fallbackUrlCache.set(cacheKey, {
+          resolvedBy: mp.resolvedBy, url: urlData.url, song: mp.song,
+          level: urlData.level, quality: urlData.quality, br: urlData.br, trial: !!urlData.trial,
+          expiresAt: Date.now() + URL_CACHE_TTL
+        });
+        return {
+          ok: true, resolvedBy: mp.resolvedBy, url: urlData.url,
+          song: mp.song, quality: { level: urlData.level, label: urlData.quality, br: urlData.br },
+          trial: !!urlData.trial, fromCache: 'mapping'
+        };
+      }
+      recordCircuitFailure(mp.resolvedBy);
+      fallbackMappingCache.delete(cacheKey);
+    } catch (e) {
+      recordCircuitFailure(mp.resolvedBy);
+      fallbackMappingCache.delete(cacheKey);
+    }
+  }
+
+  // Multi-round search — progressive query simplification
+  var allProviders = buildFallbackProviderOrder(body.excludeProvider);
+  var brokenList = allProviders.filter(function(p) { return isCircuitBroken(p); });
+  var providers = allProviders.filter(function(p) { return !isCircuitBroken(p); });
+  if (!providers.length) {
+    return { ok: false, tried: allProviders, circuitBroken: brokenList,
+      reason: 'all_providers_circuit_broken', details: [] };
+  }
+
+  var queries = buildSearchQueries(name, artist);
+  var allMatches = {}; // provider → song
+  var details = [];
+
+  // Round-by-round: stop as soon as any platform matches
+  for (var qi = 0; qi < queries.length; qi++) {
+    var query = queries[qi];
+    var roundLabel = 'q' + (qi + 1);
+
+    var searchResults = await Promise.allSettled(
+      providers.map(function(p) { return runPlatformSearch(p, query, 8); })
+    );
+
+    for (var i = 0; i < searchResults.length; i++) {
+      var provider = providers[i];
+      if (allMatches[provider]) continue;
+
+      var result = searchResults[i];
+      if (result.status !== 'fulfilled') {
+        recordCircuitFailure(provider);
+        details.push({ provider: provider, searchStrategy: roundLabel, matched: false, error: 'search_failed' });
+        continue;
+      }
+
+      var songs = result.value || [];
+      var match = songs.find(function(s) { return isSameTitleArtist({name: name, artist: artist}, s); });
+      if (match) {
+        allMatches[provider] = match;
+        details.push({ provider: provider, searchStrategy: roundLabel, matched: true });
+      }
+    }
+
+    if (Object.keys(allMatches).length > 0) break;
+  }
+
+  // Record providers that never matched
+  providers.forEach(function(p) {
+    if (!allMatches[p]) {
+      details.push({ provider: p, searchStrategy: 'none', matched: false, error: 'no_match_after_all_rounds' });
+    }
+  });
+
+  // Sequential URL fetch by priority
+  var bestTrial = null;
+  var priorityOrder = providers.filter(function(p) { return allMatches[p]; });
+
+  for (var j = 0; j < priorityOrder.length; j++) {
+    var prv = priorityOrder[j];
+    var match = allMatches[prv];
+
+    try {
+      var urlData = await runPlatformUrl(prv, match, body.quality);
+      if (urlData && urlData.url) {
+        recordCircuitSuccess(prv);
+        if (!urlData.trial) {
+          fallbackMappingCache.set(cacheKey, {
+            resolvedBy: prv, song: match, expiresAt: Date.now() + MAPPING_CACHE_TTL
+          });
+          fallbackUrlCache.set(cacheKey, {
+            resolvedBy: prv, url: urlData.url, song: match,
+            level: urlData.level, quality: urlData.quality, br: urlData.br, trial: false,
+            expiresAt: Date.now() + URL_CACHE_TTL
+          });
+          return { ok: true, resolvedBy: prv, url: urlData.url,
+            song: match, quality: { level: urlData.level, label: urlData.quality, br: urlData.br },
+            trial: false, fromCache: false, details: details };
+        }
+        if (!bestTrial) {
+          bestTrial = { resolvedBy: prv, url: urlData.url, song: match,
+            level: urlData.level, quality: urlData.quality, br: urlData.br, trial: true };
+        }
+        continue;
+      }
+    } catch (e) { /* URL fetch failed, try next */ }
+    recordCircuitFailure(prv);
+  }
+
+  // Trial fallback
+  if (bestTrial) {
+    fallbackMappingCache.set(cacheKey, {
+      resolvedBy: bestTrial.resolvedBy, song: bestTrial.song, expiresAt: Date.now() + MAPPING_CACHE_TTL
+    });
+    fallbackUrlCache.set(cacheKey, {
+      resolvedBy: bestTrial.resolvedBy, url: bestTrial.url, song: bestTrial.song,
+      level: bestTrial.level, quality: bestTrial.quality, br: bestTrial.br, trial: true,
+      expiresAt: Date.now() + URL_CACHE_TTL
+    });
+    return { ok: true, resolvedBy: bestTrial.resolvedBy, url: bestTrial.url,
+      song: bestTrial.song, quality: { level: bestTrial.level, label: bestTrial.quality, br: bestTrial.br },
+      trial: true, fromCache: false, details: details };
+  }
+
+  return { ok: false, tried: providers, circuitBroken: brokenList,
+    reason: 'all_providers_exhausted', details: details };
+}
+
 function parseCookieStringForQishui(raw) {
   const obj = {};
   String(raw || '').split(';').forEach(part => {
@@ -5114,6 +5283,18 @@ const server = http.createServer(async (req, res) => {
     } catch (err) {
       console.error('[PlaylistTracks]', err);
       sendJSON(res, { error: err.message, tracks: [] }, 500);
+    }
+    return;
+  }
+
+  // ---------- Multi-Source Fallback ----------
+  if (pn === '/api/resolve-song-url' && req.method === 'POST') {
+    try {
+      var resolveBody = await readRequestBody(req);
+      sendJSON(res, await resolveSongUrl(resolveBody));
+    } catch (err) {
+      console.error('[ResolveSongUrl]', err);
+      sendJSON(res, { ok: false, error: err.message }, 500);
     }
     return;
   }
