@@ -3337,7 +3337,7 @@ function normalizeMatchText(text) {
     .replace(/^(cover|翻唱)\s*[：:]\s*/i, '')
     .replace(/[（(【\[](.+?)[）)】\]]/g, ' $1 ')
     .replace(/feat\.\s|ft\.\s|featuring\s/gi, ' ')
-    .replace(/[\s·・\-—_.,，。:：;；'"!！?？'""/\\|&@#$%^*()（）【】\[\]{}<>~`+=]+/g, ' ')
+    .replace(/[\s·・\-—_.,，。:：;；'""!！?？'""/\\|&@#$%^*()（）【】\[\]{}<>~`+=]+/g, ' ')
     .replace(/\s+/g, ' ').trim();
 }
 function artistNameParts(song) {
@@ -5344,6 +5344,7 @@ const server = http.createServer(async (req, res) => {
       'Access-Control-Allow-Origin': '*',
       'X-Accel-Buffering': 'no',
     });
+    res.flushHeaders();
 
     var heartbeat = setInterval(function() {
       try { res.write(': heartbeat\n\n'); }

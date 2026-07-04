@@ -18322,7 +18322,7 @@ function showSourceFallbackNotice(title, body) {
 function normalizeMatchText(text) {
   return String(text || '').toLowerCase()
     .replace(/[（(【\[].*?[）)】\]]/g, '')
-    .replace(/[\s·・\-—_.,，。:：'"“”‘’/\\|]+/g, '');
+    .replace(/[\s·・\-—_.,，。:：'"“”‘‘’/\\|]+/g, '');
 }
 function artistNameParts(song) {
   var parts = [];
@@ -18457,7 +18457,7 @@ async function applyFallbackResult(resolved, song, idx, token) {
 // Client-side fallback: simple single-platform attempt (preserves old behavior)
 async function clientSideFallback(song, idx, token) {
   var target = songProviderKey(song) === 'netease' ? 'qq' : 'netease';
-  var query = [song.name || song.title || '', song.artist || ''].filter(Boolean).join(' ').trim();
+  var query = [song.name || song.title || '', song.artist || (artistNameParts(song)[0] || '')].filter(Boolean).join(' ').trim();
   if (!query) { skipFailedQueueItem(idx, token, '无法执行客户端降级换源。'); return true; }
 
   var url = target === 'qq'
@@ -18653,7 +18653,7 @@ async function playQueueAt(idx, opts) {
       if (token !== trackSwitchToken) return;
       finalizeListenSession(true);
       if (playMode === 'single') setTimeout(function() { playQueueAt(currentIdx, { autoRepeat: true }); }, 0);
-      else if (playMode === 'list-order' || playMode === 'shuffle') playNext();
+      else setTimeout(nextTrack, 0);
     };
     audio.onerror = function() {
       if (token !== trackSwitchToken) return;
