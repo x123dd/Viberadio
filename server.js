@@ -3582,6 +3582,20 @@ async function doResolveSongUrl(name, artist, body, cacheKey) {
     reason: 'all_providers_exhausted', details: details };
 }
 
+// ====================================================================
+//  Wallpaper Engine SSE — 全局状态
+// ====================================================================
+var wallpaperAudioData = {
+  playing: false,
+  title: '', artist: '', cover: '',
+  frequencyData: [],
+  primaryColor: '#d6f8ff',
+  secondaryColor: '#9cffdf',
+};
+var wallpaperSubscribers = new Set();
+var wallpaperBroadcastTimer = 0;
+var WALLPAPER_BROADCAST_MIN_MS = 33; // max 30fps broadcast
+
 function parseCookieStringForQishui(raw) {
   const obj = {};
   String(raw || '').split(';').forEach(part => {
@@ -5296,6 +5310,53 @@ const server = http.createServer(async (req, res) => {
       console.error('[ResolveSongUrl]', err);
       sendJSON(res, { ok: false, error: err.message }, 500);
     }
+    return;
+  }
+
+  // ---------- Wallpaper Engine SSE ----------
+  if (pn === '/api/wallpaper/push' && req.method === 'POST') {
+    try {
+      var pushBody = await readRequestBody(req);
+      wallpaperAudioData = { ...wallpaperAudioData, ...pushBody };
+
+      var now = Date.now();
+      if (now - wallpaperBroadcastTimer >= WALLPAPER_BROADCAST_MIN_MS) {
+        wallpaperBroadcastTimer = now;
+        var payload = JSON.stringify(wallpaperAudioData);
+        wallpaperSubscribers.forEach(function(client) {
+          try { client.write('data: ' + payload + '\n\n'); }
+          catch (e) { wallpaperSubscribers.delete(client); }
+        });
+      }
+
+      sendJSON(res, { ok: true });
+    } catch (err) {
+      sendJSON(res, { ok: false, error: err.message }, 400);
+    }
+    return;
+  }
+
+  if (pn === '/api/wallpaper/stream' && req.method === 'GET') {
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+      'X-Accel-Buffering': 'no',
+    });
+
+    var heartbeat = setInterval(function() {
+      try { res.write(': heartbeat\n\n'); }
+      catch (e) { clearInterval(heartbeat); }
+    }, 30000);
+
+    res.write('data: ' + JSON.stringify(wallpaperAudioData) + '\n\n');
+    wallpaperSubscribers.add(res);
+
+    req.on('close', function() {
+      clearInterval(heartbeat);
+      wallpaperSubscribers.delete(res);
+    });
     return;
   }
 
