@@ -18660,14 +18660,12 @@ async function playQueueAt(idx, opts) {
       skipFailedQueueItem(idx, token, '预解析音频加载失败，正在播放下一首。');
     };
 
-    handleControlPlayState();
     hideLoading(); showLoading();
     audio.play().then(function() {
       hideLoading(); forcePlaybackControlsInteractive();
       if (token === trackSwitchToken) {
+        playing = true; setPlayIcon(true);
         audioDuration = audio.duration || 0;
-        ensureLyricSanity(audioDuration);
-        startPlaybackProgressTimer();
         if (opts.startTime > 0) audio.currentTime = opts.startTime;
       }
     }).catch(function(e) {
@@ -18676,14 +18674,10 @@ async function playQueueAt(idx, opts) {
       showSourceFallbackNotice('播放失败', e.message || '浏览器拒绝了自动播放。');
     });
 
-    scheduleBeatAnalysisIfNeeded();
+    safePlaybackStep('listen-session-begin', function() { beginListenSession(song, playbackContext); });
+    fetchLyric(song, token);
     scheduleQueueBeatPrefetch(idx, 1200);
-    fetchLyricForCurrent();
-    initPodcastDjModeForCurrent();
-    updateNowPlayingSong(song);
     if (firstVisualPlay) { firstPlayDone = true; tweenParticleAlpha(uniforms.uAlpha.value || 0, 1.0, 220); }
-    safeFirePlaybackStep('playStateListeners');
-    safeFirePlaybackStep('trackChangeListeners');
     return;
   }
 
