@@ -3285,6 +3285,134 @@ const QISHUI_QUALITY_CANDIDATES = [
   { level: 'standard', br: 128000, label: '标准' },
 ];
 
+// ====================================================================
+//  Multi-Source Fallback — 全局状态
+// ====================================================================
+var providerCircuitBreaker = {
+  netease: { failures: 0, brokenUntil: 0 },
+  qq:      { failures: 0, brokenUntil: 0 },
+  kg:      { failures: 0, brokenUntil: 0 },
+  qs:      { failures: 0, brokenUntil: 0 },
+};
+var fallbackMappingCache = new Map(); // key → {resolvedBy, song, expiresAt}  TTL: 2h
+var fallbackUrlCache     = new Map(); // key → {resolvedBy, url, song, level, quality, br, trial, expiresAt}  TTL: 10min
+var pendingResolves = new Map();      // key → Promise (concurrent dedup)
+
+var MAPPING_CACHE_TTL = 2 * 60 * 60 * 1000;  // 2h
+var URL_CACHE_TTL     = 10 * 60 * 1000;       // 10min
+var CIRCUIT_BREAKER_THRESHOLD = 3;
+var CIRCUIT_BREAKER_COOLDOWN  = 30000;        // 30s
+
+setInterval(function() {
+  var now = Date.now();
+  fallbackMappingCache.forEach(function(v, k) { if (v.expiresAt <= now) fallbackMappingCache.delete(k); });
+  fallbackUrlCache.forEach(function(v, k)     { if (v.expiresAt <= now) fallbackUrlCache.delete(k); });
+}, 5 * 60 * 1000);
+
+// ====================================================================
+//  Multi-Source Fallback — 熔断器
+// ====================================================================
+function isCircuitBroken(provider) {
+  var cb = providerCircuitBreaker[provider];
+  if (!cb || cb.brokenUntil === 0) return false;
+  if (Date.now() > cb.brokenUntil) { cb.brokenUntil = 0; cb.failures = 0; return false; }
+  return true;
+}
+function recordCircuitSuccess(provider) {
+  var cb = providerCircuitBreaker[provider];
+  if (cb) { cb.failures = 0; cb.brokenUntil = 0; }
+}
+function recordCircuitFailure(provider) {
+  var cb = providerCircuitBreaker[provider];
+  if (!cb) return;
+  cb.failures++;
+  if (cb.failures >= CIRCUIT_BREAKER_THRESHOLD) cb.brokenUntil = Date.now() + CIRCUIT_BREAKER_COOLDOWN;
+}
+
+// ====================================================================
+//  Multi-Source Fallback — 文本匹配
+// ====================================================================
+function normalizeMatchText(text) {
+  return String(text || '').toLowerCase()
+    .replace(/^(cover|翻唱)\s*[：:]\s*/i, '')
+    .replace(/[（(【\[](.+?)[）)】\]]/g, ' $1 ')
+    .replace(/feat\.\s|ft\.\s|featuring\s/gi, ' ')
+    .replace(/[\s·・\-—_.,，。:：;；'"!！?？'""/\\|&@#$%^*()（）【】\[\]{}<>~`+=]+/g, ' ')
+    .replace(/\s+/g, ' ').trim();
+}
+function artistNameParts(song) {
+  var parts = [];
+  if (Array.isArray(song.artists)) {
+    song.artists.forEach(function(a) { if (a && a.name) parts.push(normalizeMatchText(a.name)); });
+  }
+  if (song.artist) {
+    String(song.artist).split(/\s*[/,、&]\s*|\s+feat\.?\s+|\s+ft\.?\s+/i).forEach(function(n) {
+      var t = normalizeMatchText(n); if (t) parts.push(t);
+    });
+  }
+  return parts.filter(Boolean);
+}
+function isSameTitleArtist(source, candidate) {
+  if (!source || !candidate) return false;
+  if (normalizeMatchText(source.name || source.title) !== normalizeMatchText(candidate.name || candidate.title)) return false;
+  var a = artistNameParts(source), b = artistNameParts(candidate);
+  if (!a.length || !b.length) return false;
+  return a.some(function(n) { return b.indexOf(n) >= 0; });
+}
+
+// ====================================================================
+//  Multi-Source Fallback — 搜索策略
+// ====================================================================
+function cleanSongName(name) {
+  return String(name || '').replace(/[（(【\[].*?[）)】\]]/g, '').replace(/\s+/g, ' ').trim();
+}
+function buildSearchQueries(name, artist) {
+  var clean = cleanSongName(name);
+  var queries = [];
+  var add = function(q) { if (q && queries.indexOf(q) === -1) queries.push(q); };
+  add([name, artist].filter(Boolean).join(' ').trim());
+  if (clean && clean !== name) add([clean, artist].filter(Boolean).join(' ').trim());
+  add(name);
+  if (clean && clean !== name) add(clean);
+  return queries;
+}
+
+// ====================================================================
+//  Multi-Source Fallback — 平台分派
+// ====================================================================
+function buildFallbackProviderOrder(excludeProvider) {
+  var FULL_ORDER = ['netease', 'qq', 'kg', 'qs'];
+  return FULL_ORDER.filter(function(p) { return p !== excludeProvider; });
+}
+async function runPlatformSearch(provider, query, limit) {
+  if (provider === 'qq') return await handleQQSearch(query, limit);
+  if (provider === 'kg') return await kugouSearch(query, limit);
+  if (provider === 'qs') return await qishuiSearch(query, limit);
+  return await handleSearch(query, limit);
+}
+async function runPlatformUrl(provider, song, qualityPreference) {
+  var raw, url, trial, level, quality, br;
+  if (provider === 'qq') {
+    raw = await handleQQSongUrl(song.mid || song.songmid || '', song.mediaMid || song.media_mid || '', qualityPreference);
+    url = raw.url || ''; trial = !!raw.trial; level = raw.level || ''; quality = raw.quality || ''; br = raw.br || 0;
+  } else if (provider === 'kg') {
+    raw = await kugouSongUrl(song.hash || song.id || '', song.album_id || song.albumId || '', qualityPreference);
+    url = raw.url || ''; trial = false;
+    level = (raw.quality && raw.quality.level) || ''; quality = (raw.quality && raw.quality.label) || '';
+    br = (raw.quality && raw.quality.br) || 0;
+  } else if (provider === 'qs') {
+    raw = await qishuiSongUrl(song.id || '', qualityPreference);
+    url = raw.url || ''; trial = false;
+    level = (raw.quality && raw.quality.level) || ''; quality = (raw.quality && raw.quality.label) || '';
+    br = (raw.quality && raw.quality.br) || 0;
+  } else {
+    var loginInfo = await getLoginInfo();
+    raw = await handleSongUrl(song.id, loginInfo, qualityPreference);
+    url = raw.url || ''; trial = !!raw.trial; level = raw.level || ''; quality = raw.quality || ''; br = raw.br || 0;
+  }
+  return { url: url, trial: trial, level: level, quality: quality, br: br };
+}
+
 function parseCookieStringForQishui(raw) {
   const obj = {};
   String(raw || '').split(';').forEach(part => {
