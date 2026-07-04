@@ -18466,6 +18466,7 @@ async function clientSideFallback(song, idx, token) {
 
   try {
     var data = await apiJson(url);
+    if (token !== trackSwitchToken) return true;
     var list = data && (data.songs || data.result || []);
     for (var i = 0; i < list.length; i++) {
       if (isSameTitleArtist(song, list[i])) {
@@ -18481,7 +18482,7 @@ async function clientSideFallback(song, idx, token) {
     }
   } catch (e2) { /* fallback also failed */ }
 
-  skipFailedQueueItem(idx, token, '全部换源方式均失败，正在播放下一首。');
+  skipFailedQueueItem(idx, token, '客户端降级换源未找到匹配歌曲，正在播放下一首。');
   return true;
 }
 
