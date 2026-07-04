@@ -18344,29 +18344,6 @@ function isSameTitleArtist(source, candidate) {
   if (!a.length || !b.length) return false;
   return a.some(function(name){ return b.indexOf(name) >= 0; });
 }
-function alternatePlaybackProvider(song) {
-  var key = songProviderKey(song);
-  if (key === 'kg') return 'netease';
-  if (key === 'qq') return 'netease';
-  return 'qq';
-}
-async function searchAlternatePlatformSong(song) {
-  var target = alternatePlaybackProvider(song);
-  var artist = artistNameParts(song)[0] || '';
-  var query = [song.name || song.title || '', song.artist || artist].filter(Boolean).join(' ').trim();
-  if (!query) return null;
-  var url = target === 'qq'
-    ? '/api/qq/search?keywords=' + encodeURIComponent(query) + '&limit=8'
-    : target === 'kg'
-      ? '/api/kg/search?keywords=' + encodeURIComponent(query) + '&limit=8'
-      : '/api/search?keywords=' + encodeURIComponent(query) + '&limit=12';
-  var data = await apiJson(url);
-  var list = data && (data.songs || data.result || []);
-  for (var i = 0; i < list.length; i++) {
-    if (isSameTitleArtist(song, list[i])) return cloneSong(list[i]);
-  }
-  return null;
-}
 function markQueueItemPlaybackFailed(idx) {
   if (playQueue[idx]) playQueue[idx]._lastPlaybackFailAt = Date.now();
 }
@@ -18394,41 +18371,120 @@ function skipFailedQueueItem(idx, token, message) {
   }
   showSourceFallbackNotice('已跳过受限歌曲', message || '未找到同名同歌手的另一个平台版本，正在播放下一首。');
   currentIdx = nextIdx;
-  playQueueAt(nextIdx, { fallbackDepth: 0 });
+  playQueueAt(nextIdx);
 }
 async function tryAutoPlaybackFallback(song, data, idx, token, opts) {
   opts = opts || {};
-  if (opts.fallbackDepth > 0) {
-    skipFailedQueueItem(idx, token, '自动换源后的版本仍不可播，正在播放下一首。');
-    return true;
-  }
   if (!song || song.type === 'local' || song.type === 'podcast' || song.source === 'podcast') return false;
+
   var restriction = (data && data.restriction) || {};
   var category = (data && data.reason) || restriction.category || '';
   var fromLabel = playbackProviderLabel(song);
-  var targetLabel = alternatePlaybackProvider(song) === 'qq' ? 'QQ 音乐' : alternatePlaybackProvider(song) === 'kg' ? '酷狗音乐' : '网易云';
-  showSourceFallbackNotice('正在自动换源', fromLabel + ' 当前不可播，正在查找 ' + targetLabel + ' 的同名同歌手版本。');
+  var excludeKey = songProviderKey(song);
+
   try {
-    var alternate = await searchAlternatePlatformSong(song);
+    showSourceFallbackNotice('正在自动换源', fromLabel + ' 暂不可播，正在查找其他平台...');
+
+    var resolved = await apiJson('/api/resolve-song-url', {
+      method: 'POST',
+      body: JSON.stringify({
+        name: song.name || song.title || '',
+        artist: song.artist || '',
+        excludeProvider: excludeKey,
+        quality: normalizePlaybackQuality(playbackQuality)
+      }),
+      headers: { 'Content-Type': 'application/json' },
+      timeoutMs: 8000
+    });
+
     if (token !== trackSwitchToken) return true;
-    if (!alternate) {
+
+    if (!resolved.ok) {
       if (category === 'login_required') return false;
-      skipFailedQueueItem(idx, token, '没有找到同名同歌手的 ' + targetLabel + ' 版本，正在播放下一首。');
+      skipFailedQueueItem(idx, token, '全部平台都没有找到可播版本。');
       return true;
     }
-    alternate.autoFallbackFrom = songProviderKey(song);
-    playQueue[idx] = hydrateCustomCover(alternate);
-    safeRenderQueuePanel('source-fallback', { scrollCurrent: miniQueueOpen });
-    safeShelfRebuild('source-fallback');
-    showSourceFallbackNotice('已自动切换音源', (song.name || '当前歌曲') + ' 已从 ' + fromLabel + ' 切到 ' + targetLabel + '。');
-    await playQueueAt(idx, { fallbackDepth: 1 });
-    return true;
+
+    return await applyFallbackResult(resolved, song, idx, token);
   } catch (e) {
+    // Client-side fallback: /resolve unavailable → try old single-platform approach
     if (token !== trackSwitchToken) return true;
-    skipFailedQueueItem(idx, token, '自动换源搜索失败，正在播放下一首。');
-    return true;
+    console.warn('[AutoFallback] server resolve failed, falling back to client-side:', e.message);
+    return await clientSideFallback(song, idx, token);
   }
 }
+
+// Apply server-side fallback result
+async function applyFallbackResult(resolved, song, idx, token) {
+  var alternate = cloneSong(resolved.song);
+  alternate.autoFallbackFrom = songProviderKey(song);
+  playQueue[idx] = hydrateCustomCover(alternate);
+  safeRenderQueuePanel('source-fallback', { scrollCurrent: miniQueueOpen });
+  safeShelfRebuild('source-fallback');
+
+  var targetLabel = resolved.resolvedBy === 'qq' ? 'QQ 音乐'
+    : resolved.resolvedBy === 'kg' ? '酷狗音乐'
+    : resolved.resolvedBy === 'qs' ? '汽水音乐'
+    : '网易云音乐';
+
+  var cacheTag = resolved.fromCache === 'url' ? ' (URL缓存)'
+    : resolved.fromCache === 'mapping' ? ' (映射缓存)' : '';
+
+  var qInfo = resolved.quality || {};
+  var qualityNote = qInfo.label || qInfo.level || '';
+  if (qualityNote && qualityNote !== '标准' && qualityNote !== 'standard') {
+    qualityNote = ' · ' + qualityNote;
+  } else {
+    qualityNote = '';
+  }
+
+  if (resolved.trial) {
+    showSourceFallbackNotice('试听兜底', (song.name || '当前歌曲') + ' — ' + targetLabel + ' 试听' + qualityNote);
+  } else if (resolved.fromCache) {
+    showSourceFallbackNotice('自动换源' + cacheTag, (song.name || '当前歌曲') + ' → ' + targetLabel + qualityNote);
+  } else {
+    showSourceFallbackNotice('已自动切换音源', (song.name || '当前歌曲') + ' → ' + targetLabel + qualityNote);
+  }
+
+  await playQueueAt(idx, {
+    preResolvedUrl: resolved.url,
+    preResolvedLevel: qInfo.level,
+    preResolvedQuality: qInfo.label
+  });
+  return true;
+}
+
+// Client-side fallback: simple single-platform attempt (preserves old behavior)
+async function clientSideFallback(song, idx, token) {
+  var target = songProviderKey(song) === 'netease' ? 'qq' : 'netease';
+  var query = [song.name || song.title || '', song.artist || ''].filter(Boolean).join(' ').trim();
+  if (!query) { skipFailedQueueItem(idx, token, '无法执行客户端降级换源。'); return true; }
+
+  var url = target === 'qq'
+    ? '/api/qq/search?keywords=' + encodeURIComponent(query) + '&limit=8'
+    : '/api/search?keywords=' + encodeURIComponent(query) + '&limit=12';
+
+  try {
+    var data = await apiJson(url);
+    var list = data && (data.songs || data.result || []);
+    for (var i = 0; i < list.length; i++) {
+      if (isSameTitleArtist(song, list[i])) {
+        var alternate = cloneSong(list[i]);
+        alternate.autoFallbackFrom = songProviderKey(song);
+        playQueue[idx] = hydrateCustomCover(alternate);
+        safeRenderQueuePanel('source-fallback-client', { scrollCurrent: miniQueueOpen });
+        showSourceFallbackNotice('客户端降级换源',
+          (song.name || '当前歌曲') + ' → ' + (target === 'qq' ? 'QQ 音乐' : '网易云音乐'));
+        await playQueueAt(idx, {});
+        return true;
+      }
+    }
+  } catch (e2) { /* fallback also failed */ }
+
+  skipFailedQueueItem(idx, token, '全部换源方式均失败，正在播放下一首。');
+  return true;
+}
+
 function handlePlaybackUnavailable(song, data) {
   hideLoading();
   forcePlaybackControlsInteractive();
