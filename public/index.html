@@ -122,22 +122,17 @@ body.idle-guide-dragging #canvas-container{cursor:grabbing}
 .splash-bg-noise{position:absolute;inset:0;z-index:3;opacity:.038;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");background-size:180px 180px;mix-blend-mode:screen;pointer-events:none}
 .splash-content{position:relative;z-index:10;display:flex;flex-direction:column;align-items:center;gap:16px;pointer-events:none;transform:translateY(4px);transition:opacity 680ms cubic-bezier(.22,1,.36,1),transform 860ms cubic-bezier(.22,1,.36,1)}
 .splash-wordmark{position:relative;display:flex;align-items:baseline;justify-content:center;height:clamp(70px,12vw,136px);min-width:min(74vw,760px);font-size:clamp(52px,8.8vw,112px);line-height:.92;font-weight:720;letter-spacing:-.055em;color:#f8f8f2;text-shadow:0 20px 82px rgba(0,0,0,.68);isolation:isolate;filter:drop-shadow(0 0 22px rgba(244,210,138,.05))}
-.splash-word-x,.splash-word-music{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;will-change:opacity,transform,letter-spacing}
-.splash-word-x{opacity:0;font-size:1.28em;font-weight:780;letter-spacing:-.02em;color:#0a0a0a;animation:splash-x-in 5200ms cubic-bezier(.22,1,.36,1) forwards;text-shadow:0 0 18px rgba(0,0,0,.72),0 0 2px rgba(255,255,255,.08);filter:drop-shadow(0 2px 4px rgba(0,0,0,.44))}
-.splash-word-music{opacity:0;letter-spacing:-.018em;background:linear-gradient(94deg,rgba(255,255,255,.06),#fff 26%,rgba(244,210,138,.98) 48%,rgba(122,215,194,.90) 68%,rgba(255,255,255,.82));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:splash-music-in 5200ms cubic-bezier(.22,1,.36,1) forwards;text-shadow:-2px 0 0 rgba(255,83,103,.16),2px 0 0 rgba(122,215,194,.22),0 0 34px rgba(122,215,194,.10)}
-.splash-heart{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);opacity:0;z-index:2;animation:splash-heart-in 5200ms cubic-bezier(.22,1,.36,1) forwards}
-.splash-heart-svg{display:block;width:clamp(52px,8vw,100px);height:clamp(52px,8vw,100px);filter:drop-shadow(0 0 14px rgba(255,30,50,.62)) drop-shadow(0 0 32px rgba(255,20,40,.36)) drop-shadow(0 0 56px rgba(255,0,30,.18));animation:heart-beat 860ms ease-in-out infinite,heart-glow-pulse 1.4s ease-in-out infinite;transform-origin:center center;will-change:transform,filter}
-@keyframes heart-beat{0%,100%{transform:scale(1)}4%{transform:scale(1.16)}8%{transform:scale(1.04)}12%{transform:scale(1.13)}16%{transform:scale(1)}50%{transform:scale(1)}54%{transform:scale(1.16)}58%{transform:scale(1.04)}62%{transform:scale(1.13)}66%{transform:scale(1)}}
-@keyframes heart-glow-pulse{0%,100%{filter:drop-shadow(0 0 14px rgba(255,30,50,.62)) drop-shadow(0 0 32px rgba(255,20,40,.36)) drop-shadow(0 0 56px rgba(255,0,30,.18))}50%{filter:drop-shadow(0 0 22px rgba(255,40,60,.78)) drop-shadow(0 0 48px rgba(255,30,50,.48)) drop-shadow(0 0 72px rgba(255,10,30,.28))}}
+.splash-word-vibe,.splash-word-radio{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);white-space:nowrap;will-change:opacity,transform,letter-spacing}
+.splash-word-vibe{opacity:0;font-size:1.28em;font-weight:780;letter-spacing:-.02em;color:#f8f4ea;animation:splash-vibe-in 5200ms cubic-bezier(.22,1,.36,1) forwards;text-shadow:0 0 22px rgba(244,210,138,.28),0 0 48px rgba(244,180,100,.12),0 2px 4px rgba(0,0,0,.38)}
+.splash-word-radio{opacity:0;letter-spacing:-.018em;font-weight:680;background:linear-gradient(94deg,rgba(255,255,255,.06),#fff 26%,rgba(244,210,138,.98) 48%,rgba(122,215,194,.90) 68%,rgba(255,255,255,.82));background-size:300% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:splash-radio-in 5200ms cubic-bezier(.22,1,.36,1) forwards;text-shadow:-2px 0 0 rgba(255,83,103,.16),2px 0 0 rgba(122,215,194,.22),0 0 34px rgba(122,215,194,.10)}
 .splash-signal-line{position:relative;width:min(460px,54vw);height:2px;background:linear-gradient(90deg,transparent,rgba(122,215,194,.22),rgba(255,255,255,.78),rgba(244,210,138,.66),rgba(255,83,103,.22),transparent);opacity:0;transform:scaleX(.12);box-shadow:0 0 18px rgba(244,210,138,.24),0 0 34px rgba(122,215,194,.10);animation:splash-signal-line 4200ms cubic-bezier(.22,1,.36,1) forwards}
 .splash-signal-line::after{content:'';position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.82);box-shadow:0 0 24px rgba(244,210,138,.54);transform:translate(-50%,-50%) scale(.32);opacity:0;animation:splash-signal-blip 4200ms cubic-bezier(.22,1,.36,1) forwards}
 .splash-sub{font-size:10px;font-weight:600;letter-spacing:.22em;color:rgba(255,255,255,.34);text-transform:uppercase;opacity:0;animation:splash-sub-in 4200ms cubic-bezier(.22,1,.36,1) forwards}
 .splash-enter{margin-top:8px;font-size:11px;font-weight:700;letter-spacing:.24em;color:rgba(255,255,255,.62);text-transform:uppercase;opacity:0;transform:translateY(10px);text-shadow:0 0 18px rgba(244,210,138,.24),0 0 34px rgba(122,215,194,.12);transition:opacity 620ms cubic-bezier(.22,1,.36,1),transform 620ms cubic-bezier(.22,1,.36,1)}
 #splash.ready .splash-enter{opacity:1;transform:translateY(0);animation:splash-enter-pulse 1800ms ease-in-out infinite alternate}
 @keyframes splash-field-breathe{0%{opacity:.72;transform:scale(1)}100%{opacity:1;transform:scale(1.035)}}
-@keyframes splash-x-in{0%{opacity:0;clip-path:inset(48% 0 49% 0);transform:translate(-50%,-42%) skewX(-10deg) scaleX(1.08);letter-spacing:.055em}14%{opacity:.92;clip-path:inset(40% 0 42% 0);transform:translate(-50%,-50%) skewX(-4deg) scaleX(1.04);letter-spacing:.014em}26%{opacity:1;clip-path:inset(0);transform:translate(-50%,-50%) skewX(0) scaleX(1);letter-spacing:-.040em}48%{opacity:1;transform:translate(-50%,-50%) scale(1)}67%{opacity:1;transform:translate(calc(-50% - clamp(180px,17vw,240px)),-50%) scale(.998);letter-spacing:-.02em}100%{opacity:1;transform:translate(calc(-50% - clamp(180px,17vw,240px)),-50%) scale(.998)}}
-@keyframes splash-heart-in{0%,38%{opacity:0;transform:translate(-50%,-50%) scale(.2)}48%{opacity:.64;transform:translate(calc(-50% - clamp(55px,6vw,85px)),-50%) scale(1.08)}56%{opacity:1;transform:translate(calc(-50% - clamp(55px,6vw,85px)),-50%) scale(.94)}64%,100%{opacity:1;transform:translate(calc(-50% - clamp(55px,6vw,85px)),-50%) scale(1)}}
-@keyframes splash-music-in{0%,32%{opacity:0;clip-path:inset(52% 0 44% 0);transform:translate(calc(-50% + clamp(78px,12vw,142px)),-50%) skewX(9deg) scaleX(1.06);background-position:0 0}48%{opacity:.88;clip-path:inset(34% 0 32% 0);transform:translate(calc(-50% + clamp(78px,11.5vw,138px)),-50%) skewX(3deg) scaleX(1.02);background-position:52% 0}66%{opacity:1;clip-path:inset(0);transform:translate(calc(-50% + clamp(78px,11.4vw,136px)),-50%) scale(1);background-position:76% 0}100%{opacity:1;transform:translate(calc(-50% + clamp(78px,11.4vw,136px)),-50%) scale(1);background-position:100% 0}}
+@keyframes splash-vibe-in{0%{opacity:0;clip-path:inset(48% 0 49% 0);transform:translate(-50%,-42%) skewX(-10deg) scaleX(1.08);letter-spacing:.055em}14%{opacity:.92;clip-path:inset(40% 0 42% 0);transform:translate(-50%,-50%) skewX(-4deg) scaleX(1.04);letter-spacing:.014em}26%{opacity:1;clip-path:inset(0);transform:translate(-50%,-50%) skewX(0) scaleX(1);letter-spacing:-.040em}48%{opacity:1;transform:translate(-50%,-50%) scale(1)}67%{opacity:1;transform:translate(calc(-50% - clamp(150px,14vw,210px)),-50%) scale(.998);letter-spacing:-.02em}100%{opacity:1;transform:translate(calc(-50% - clamp(150px,14vw,210px)),-50%) scale(.998)}}
+@keyframes splash-radio-in{0%,32%{opacity:0;clip-path:inset(52% 0 44% 0);transform:translate(calc(-50% + clamp(70px,10vw,130px)),-50%) skewX(9deg) scaleX(1.06);background-position:0 0}48%{opacity:.88;clip-path:inset(34% 0 32% 0);transform:translate(calc(-50% + clamp(70px,10vw,130px)),-50%) skewX(3deg) scaleX(1.02);background-position:52% 0}66%{opacity:1;clip-path:inset(0);transform:translate(calc(-50% + clamp(70px,10vw,130px)),-50%) scale(1);background-position:76% 0}100%{opacity:1;transform:translate(calc(-50% + clamp(70px,10vw,130px)),-50%) scale(1);background-position:100% 0}}
 @keyframes splash-signal-line{0%,28%{opacity:0;transform:scaleX(.10)}44%{opacity:.98;transform:scaleX(1.05)}64%{opacity:.70;transform:scaleX(.82)}76%{opacity:1;transform:scaleX(1.14);box-shadow:0 0 28px rgba(244,210,138,.36),0 0 60px rgba(122,215,194,.18)}100%{opacity:.30;transform:scaleX(.64)}}
 @keyframes splash-signal-blip{0%,42%{opacity:0;left:18%;transform:translate(-50%,-50%) scale(.24)}62%{opacity:.94;left:50%;transform:translate(-50%,-50%) scale(1)}76%{opacity:1;left:50%;transform:translate(-50%,-50%) scale(1.45)}100%{opacity:.16;left:82%;transform:translate(-50%,-50%) scale(.46)}}
 @keyframes splash-sub-in{0%,38%{opacity:0;transform:translateY(7px)}56%{opacity:.58;transform:translateY(0)}100%{opacity:.42;transform:translateY(0)}}
@@ -1891,28 +1886,12 @@ html.control-glass-svg-ok #visual-guide-btn:hover{
 
   <!-- 主内容 -->
   <div class="splash-content">
-    <div class="splash-wordmark" id="splash-wordmark" aria-label="X heart music">
-      <span class="splash-word-x">X</span>
-      <span class="splash-heart" aria-label="love">
-        <svg class="splash-heart-svg" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <radialGradient id="heart-grad" cx="50%" cy="30%" r="60%">
-              <stop offset="0%" stop-color="#ff4444"/>
-              <stop offset="50%" stop-color="#ee1111"/>
-              <stop offset="100%" stop-color="#aa0000"/>
-            </radialGradient>
-            <filter id="heart-glow">
-              <feGaussianBlur stdDeviation="1.2" result="blur"/>
-              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-            </filter>
-          </defs>
-          <path d="M16 28 C8 20 2 15 2 10 C2 6 5 3 9 3 C11.5 3 13.5 4.5 16 7 C18.5 4.5 20.5 3 23 3 C27 3 30 6 30 10 C30 15 24 20 16 28Z" fill="url(#heart-grad)" filter="url(#heart-glow)" stroke="#ff6666" stroke-width="0.5"/>
-        </svg>
-      </span>
-      <span class="splash-word-music" aria-label="music">music</span>
+    <div class="splash-wordmark" id="splash-wordmark" aria-label="Viberadio">
+      <span class="splash-word-vibe">Vibe</span>
+      <span class="splash-word-radio" aria-label="radio">radio</span>
     </div>
     <div class="splash-signal-line"></div>
-    <div class="splash-sub">private visual music</div>
+    <div class="splash-sub">visual sound experience</div>
     <div class="splash-enter" aria-hidden="true">点击进入</div>
   </div>
 </div>
