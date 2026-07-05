@@ -33,9 +33,10 @@ jobs:
 
       - name: Upload to Release
         run: |
+          $ver = "${{ inputs.version }}" -replace '^v',''
           gh release upload ${{ inputs.version }} `
-            dist/Viberadio-${{ inputs.version }}-Setup.exe `
-            dist/Viberadio-${{ inputs.version }}-Setup.exe.blockmap `
+            dist/Viberadio-$ver-Setup.exe `
+            dist/Viberadio-$ver-Setup.exe.blockmap `
             dist/latest.yml `
             --repo x123dd/Viberadio `
             --clobber
